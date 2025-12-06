@@ -1,4 +1,4 @@
-import { Container, Graphics, Sprite, Text, TextStyle } from 'pixi.js';
+import { Container, Sprite, Text, TextStyle } from 'pixi.js';
 import { brown_slot_box } from '../AssetManager';
 
 export interface SlotMachineOptions {

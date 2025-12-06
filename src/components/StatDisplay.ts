@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, loadImageBitmap, Text, TextStyle } from 'pixi.js';
+import { Application, Container, Text, TextStyle } from 'pixi.js';
 import { getStatColor, getStatModifier } from '../CharacterUtils';
 import { button_test } from '../AssetManager';
 import { Background } from './Background';
