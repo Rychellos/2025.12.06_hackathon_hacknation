@@ -1,5 +1,5 @@
 import { Application, Container, Text, TextStyle, Graphics } from "pixi.js";
-import { MenuButton } from "../MenuButton";
+import { MenuButton } from "../components/MenuButton";
 import { SlotMachineScene } from "./SlotMachineScene";
 
 import { LevelSelectScene } from "./LevelSelectScene";

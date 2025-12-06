@@ -1,10 +1,8 @@
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
 
 import { LevelSelectScene } from './LevelSelectScene';
-import { SlotMachineScene } from './SlotMachineScene';
-import UserData from '../data/UsersCharacter';
 import { ImageButton } from '../components/ImageButton';
-import { playButton, rankingButton, settingsButton } from '../AssetManager';
+import { background, playButton, rankingButton, settingsButton } from '../AssetManager';
 
 /**
  * Main menu scene for the game
@@ -47,9 +45,7 @@ export class MainMenuScene extends Container {
     private updateBackground(): void {
         this.background.clear();
         this.background.rect(0, 0, this.app.screen.width, this.app.screen.height);
-        this.background.fill({
-            color: 0x0a0e27,
-        });
+        this.background.fill(background);
     }
 
     private createParticles(): void {
@@ -122,51 +118,7 @@ export class MainMenuScene extends Container {
                     this.onPlayClick();
                 } else {
                     this.destroy();
-
-                    // Store stats temporarily
-                    let currentStats: Record<string, number> = {
-                        attack: 10,
-                        defense: 10,
-                        hitPoints: 10,
-                    };
-
-                    const slotScene = new SlotMachineScene({
-                        app: this.app,
-                        maxRerolls: 3,
-                        stats: [
-                            { key: 'attack', label: 'Attack', initialValue: 10 },
-                            { key: 'defense', label: 'Defense', initialValue: 10 },
-                            { key: 'hitPoints', label: 'Hit Points', initialValue: 10 },
-                        ],
-                        onStatsUpdate: (stats) => {
-                            currentStats = stats;
-                            console.log('Stats updated:', stats);
-                        },
-                        onNext: () => {
-                            // Update UserData with final stats
-                            UserData.setAttack(currentStats.attack);
-                            UserData.setDefense(currentStats.defense);
-                            UserData.setHitPoints(currentStats.hitPoints);
-                            console.log('UserData updated with stats:', currentStats);
-
-                            // Navigate to Level Select
-                            slotScene.destroy();
-                            this.app.stage.addChild(new LevelSelectScene(this.app));
-                        },
-                    });
-
-                    // Center the slot scene
-                    slotScene.position.set(
-                        this.app.screen.width / 2 - 140,
-                        this.app.screen.height / 2 - 200
-                    );
-
-                    this.app.stage.addChild(slotScene);
-
-                    // Auto-start rolling
-                    setTimeout(() => {
-                        slotScene.performInitialRoll();
-                    }, 500);
+                    this.app.stage.addChild(new LevelSelectScene(this.app));
                 }
             },
             texture: playButton

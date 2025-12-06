@@ -21,13 +21,6 @@ export const setHitPoints = (value: number) => {
     data.stats.hitPoints.value = value;
 }
 
-setInterval(() => {
-    const newStats = generateRandomStats()
-    data.stats.attack.value = newStats.attack.value;
-    data.stats.defense.value = newStats.defense.value;
-    data.stats.hitPoints.value = newStats.hitPoints.value;
-}, 1000);
-
 export default {
     getData,
     setAttack,

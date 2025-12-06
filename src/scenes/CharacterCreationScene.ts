@@ -1,5 +1,5 @@
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
-import { MenuButton } from '../MenuButton';
+import { MenuButton } from '../components/MenuButton';
 import { Character } from '../CharacterUtils';
 import { SlotMachineScene } from './SlotMachineScene';
 

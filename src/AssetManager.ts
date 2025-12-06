@@ -5,6 +5,7 @@ export const button_test: Texture = await Assets.load((await import("./assets/bu
 export const playButton: Texture = await Assets.load((await import("./assets/graj.png")).default);
 export const settingsButton: Texture = await Assets.load((await import("./assets/ustaw.png")).default);
 export const rankingButton: Texture = await Assets.load((await import("./assets/rank.png")).default);
+export const background: Texture = await Assets.load((await import("./assets/bg.png")).default);
 
 // Slot machine and reroll button textures
 export const brown_slot_box: Texture = await Assets.load("/assets/brown_slot_box.png");
