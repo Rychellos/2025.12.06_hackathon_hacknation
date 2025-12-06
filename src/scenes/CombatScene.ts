@@ -9,7 +9,7 @@ import {
 import { MenuButton } from "../components/MenuButton";
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
-import { bossbackground, casino_table_panel } from "../AssetManager";
+import { bossBackground, casino_table_panel } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
 
@@ -34,10 +34,11 @@ export class CombatScene extends Container {
 
   private createBackground(): void {
     this.background = new Background({
-      texture: bossbackground,
-      width: this.app.screen.width,
       height: this.app.screen.height,
-    })
+      width: this.app.screen.width,
+      texture: bossBackground
+    });
+    // this.background.rect(0, 0, this.app.screen.width, this.app.screen.height);
     this.addChild(this.background);
 
     // Add a "floor" or visual separation for the battle arena style

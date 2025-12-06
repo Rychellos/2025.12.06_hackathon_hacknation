@@ -19,6 +19,9 @@ export const background: Texture = await Assets.load(
 export const levelSelectBackground: Texture = await Assets.load(
   (await import("./assets/mapBG.png")).default,
 );
+export const bossBackground: Texture = await Assets.load(
+  (await import("./assets/casinoBG.png")).default,
+);
 
 export const logo: Texture = await Assets.load(
   (await import("./assets/logo.png")).default,
@@ -78,9 +81,6 @@ export const slotySheet = new Spritesheet(slotySheetTexture, slotySheetData);
 await slotySheet.parse();
 
 // Slot machine and reroll button textures
-export const brown_slot_box: Texture = await Assets.load(
-  "/assets/brown_slot_box.png",
-);
 export const reroll_button: Texture = await Assets.load(
   "/assets/reroll_button.png",
 );
