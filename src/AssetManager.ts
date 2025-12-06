@@ -20,6 +20,14 @@ export const levelSelectBackground: Texture = await Assets.load(
   (await import("./assets/mapBG.png")).default,
 );
 
+export const logo: Texture = await Assets.load(
+  (await import("./assets/logo.png")).default,
+);
+
+export const bossbackground: Texture = await Assets.load(
+  (await import("./assets/casinoBG.png")).default,
+);
+
 // Load the sprite sheet texture
 const slotySheetTexture: Texture = await Assets.load(
   (await import("./assets/sloty-Sheet.png")).default,

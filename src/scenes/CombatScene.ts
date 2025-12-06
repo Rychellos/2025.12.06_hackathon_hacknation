@@ -9,8 +9,9 @@ import {
 import { MenuButton } from "../components/MenuButton";
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
-import { casino_table_panel } from "../AssetManager";
+import { bossbackground, casino_table_panel } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
+import { Background } from "../components/Background";
 
 type Choice = "rock" | "paper" | "scissors";
 
@@ -20,7 +21,7 @@ export class CombatScene extends Container {
   private playerDisplay!: UnitDisplay;
   private resultText!: Text;
   private choiceText!: Text;
-  private background!: Graphics;
+  private background!: Background;
 
   constructor(app: Application) {
     super();
@@ -32,9 +33,11 @@ export class CombatScene extends Container {
   }
 
   private createBackground(): void {
-    this.background = new Graphics();
-    this.background.rect(0, 0, this.app.screen.width, this.app.screen.height);
-    this.background.fill({ color: 0x1a1a2e });
+    this.background = new Background({
+      texture: bossbackground,
+      width: this.app.screen.width,
+      height: this.app.screen.height,
+    })
     this.addChild(this.background);
 
     // Add a "floor" or visual separation for the battle arena style
