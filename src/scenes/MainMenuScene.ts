@@ -1,8 +1,8 @@
-import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
+import { Application, Container, Graphics, Sprite } from 'pixi.js';
 
 import { LevelSelectScene } from './LevelSelectScene';
 import { ImageButton } from '../components/ImageButton';
-import { background, playButton, rankingButton, settingsButton } from '../AssetManager';
+import { background, playButton, rankingButton, settingsButton, logo } from '../AssetManager';
 
 /**
  * Main menu scene for the game
@@ -14,7 +14,7 @@ export class MainMenuScene extends Container {
 
     // UI Elements
     private background!: Graphics;
-    private title!: Text;
+    private title!: Sprite;
     private playButton!: ImageButton;
     private settingsButton!: ImageButton;
     private rankingButton!: ImageButton;
@@ -72,24 +72,7 @@ export class MainMenuScene extends Container {
     }
 
     private createTitle(): void {
-        const titleStyle = new TextStyle({
-            fontFamily: 'Arial, sans-serif',
-            fontSize: 72,
-            fontWeight: 'bold',
-            fill: 0xffffff,
-            stroke: { color: 0x1a1a3e, width: 5 },
-            dropShadow: {
-                color: 0x4a90e2,
-                blur: 10,
-                angle: Math.PI / 3,
-                distance: 5,
-            },
-        });
-
-        this.title = new Text({
-            text: 'EPIC GAME',
-            style: titleStyle,
-        });
+        this.title = new Sprite(logo);
         this.title.anchor.set(0.5);
         this.positionTitle();
 
@@ -97,9 +80,12 @@ export class MainMenuScene extends Container {
 
         // Add pulse animation to title
         let elapsed = 0;
+        const baseScale = 0.27;
         this.app.ticker.add((time) => {
             elapsed += time.deltaTime * 0.05;
-            this.title.scale.set(1 + Math.sin(elapsed) * 0.05);
+            // Pulse scale relative to base scale
+            const pulse = 1 + Math.sin(elapsed) * 0.05;
+            this.title.scale.set(baseScale * pulse);
         });
     }
 
