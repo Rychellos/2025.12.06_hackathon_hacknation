@@ -28,4 +28,3 @@ import { MainMenuScene } from "./scenes/MainMenuScene";
   // Start with main menu
   showMainMenu();
 })();
-
