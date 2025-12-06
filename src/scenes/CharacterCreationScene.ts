@@ -101,13 +101,6 @@ export class CharacterCreationScene extends Container {
         { key: "defense", label: "Defense", initialValue: 10 },
         { key: "hitPoints", label: "Hit Points", initialValue: 10 },
       ],
-      //   onStatsUpdate: (stats) => {
-      //     // Update character stats when rolls complete
-      //     this.character.stats.attack.value = stats.attack;
-      //     this.character.stats.defense.value = stats.defense;
-      //     this.character.stats.hitPoints.value = stats.hitPoints;
-      //     console.log("Character stats updated:", this.character.stats);
-      //   },
     });
 
     // Position the slot machine scene

@@ -9,11 +9,15 @@ import {
 import { MenuButton } from "../components/MenuButton";
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
-import { bossBackground, casino_table_panel } from "../AssetManager";
+import { bossBackground, casino_table_panel, paper, rock, scissors } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
+import { ImageButton } from "../components/ImageButton";
+import UsersCharacter from "../data/UsersCharacter";
 
 type Choice = "rock" | "paper" | "scissors";
+
+const MULTIPLIER = 10;
 
 export class CombatScene extends Container {
   private app: Application;
@@ -79,11 +83,11 @@ export class CombatScene extends Container {
 
     // --- PLAYER AREA (Bottom Right of Table) ---
     this.playerDisplay = new UnitDisplay({
-      name: "PLAYER",
-      maxHp: 100,
-      currentHp: 100,
-      maxShield: 20,
-      currentShield: 20,
+      name: UsersCharacter.getData().name || "Gracz",
+      maxHp: MULTIPLIER * UsersCharacter.getData().stats.hitPoints.value,
+      currentHp: MULTIPLIER * UsersCharacter.getData().stats.hitPoints.value,
+      maxShield: MULTIPLIER * UsersCharacter.getData().stats.defense.value,
+      currentShield: MULTIPLIER * UsersCharacter.getData().stats.defense.value,
       showVisual: false,
       nameColor: "#4ade80",
     });
@@ -96,7 +100,7 @@ export class CombatScene extends Container {
 
     // --- PLAYER ACTION AREA (Bottom Left of Table) ---
     const actionPanelY = this.app.screen.height - 130;
-    const actionPanelX = this.app.screen.width * 0.3; // Left Area
+    const actionPanelX = this.app.screen.width * 0.5; // Left Area
 
     // Container for action buttons
     const actionContainer = new Container();
@@ -106,24 +110,24 @@ export class CombatScene extends Container {
     const btnWidth = 120;
     const btnSpacing = 140;
 
-    const rockBtn = new MenuButton({
-      label: "ROCK",
+    const rockBtn = new ImageButton({
+      texture: rock,
       width: btnWidth,
       height: 50,
       onClick: () => this.play("rock"),
     });
     rockBtn.position.set(-btnSpacing, 0);
 
-    const paperBtn = new MenuButton({
-      label: "PAPER",
+    const paperBtn = new ImageButton({
+      texture: paper,
       width: btnWidth,
       height: 50,
       onClick: () => this.play("paper"),
     });
     paperBtn.position.set(0, 0);
 
-    const scissorsBtn = new MenuButton({
-      label: "SCISSORS",
+    const scissorsBtn = new ImageButton({
+      texture: scissors,
       width: btnWidth,
       height: 50,
       onClick: () => this.play("scissors"),
@@ -184,7 +188,7 @@ export class CombatScene extends Container {
     });
 
     this.choiceText = new Text({
-      text: "Choose your move...",
+      text: "Wybierz swój ruch...",
       style: choiceStyle,
     });
     this.choiceText.anchor.set(0.5, 1);
@@ -193,9 +197,9 @@ export class CombatScene extends Container {
 
     // Back Button
     const backBtn = new MenuButton({
-      label: "← FLEE",
-      width: 100,
-      height: 40,
+      label: "Ucieknij",
+      width: 128,
+      height: 48,
       onClick: () => {
         this.destroy();
         this.app.stage.addChild(new LevelSelectScene(this.app));
@@ -209,31 +213,35 @@ export class CombatScene extends Container {
     const choices: Choice[] = ["rock", "paper", "scissors"];
     const computerChoice = choices[Math.floor(Math.random() * choices.length)];
 
-    this.choiceText.text = `You used ${playerChoice.toUpperCase()}! Foe used ${computerChoice.toUpperCase()}!`;
+    this.choiceText.text = `Wybrałeś ${playerChoice.toUpperCase()}! Przeciwnik wybrał ${computerChoice.toUpperCase()}!`;
 
-    const dmg = 10;
+    let dmg = 10 - Math.min(Math.floor(Math.random() * 5), UsersCharacter.getData().stats.defense.value);
 
     if (playerChoice === computerChoice) {
-      this.resultText.text = "DRAW!";
+      this.resultText.text = "REMIS!";
       this.resultText.style.fill = "#ffffff";
     } else if (
       (playerChoice === "rock" && computerChoice === "scissors") ||
       (playerChoice === "paper" && computerChoice === "rock") ||
       (playerChoice === "scissors" && computerChoice === "paper")
     ) {
-      this.resultText.text = "EFFECTIVE!";
+      this.resultText.text = "Wygrałeś!";
       this.resultText.style.fill = "#4ade80"; // Green
 
       // Deal damage to BOSS
       const currentHp = this.bossDisplay.hp - dmg;
       this.bossDisplay.updateHealth(Math.max(0, currentHp));
     } else {
-      this.resultText.text = "FAILED!";
+      this.resultText.text = "Przegrałeś!";
       this.resultText.style.fill = "#ef4444"; // Red
+
+      dmg -= UsersCharacter.getData().stats.defense.value * 0.5;
+      UsersCharacter.setDefense(UsersCharacter.getData().stats.defense.value - Math.min(dmg, UsersCharacter.getData().stats.defense.value * 0.5));
 
       // Deal damage to PLAYER
       const currentHp = this.playerDisplay.hp - dmg;
       this.playerDisplay.updateHealth(Math.max(0, currentHp));
+      this.playerDisplay.updateShield(UsersCharacter.getData().stats.defense.value);
     }
 
     // Clear result text after delay
@@ -257,6 +265,11 @@ export class CombatScene extends Container {
         this.removeChild(overlay);
         this.removeChild(slotMachineScene);
       },
+      onRoll: () => {
+        const userData = UsersCharacter.getData();
+        this.playerDisplay.updateHealth(MULTIPLIER * userData.stats.hitPoints.value, MULTIPLIER * userData.stats.hitPoints.value);
+        this.playerDisplay.updateShield(MULTIPLIER * userData.stats.defense.value, MULTIPLIER * userData.stats.defense.value);
+      }
     });
 
     // Center the slot machine scene
@@ -269,5 +282,9 @@ export class CombatScene extends Container {
 
     // Initial auto-roll
     slotMachineScene.performInitialRoll();
+
+    const userData = UsersCharacter.getData();
+    this.playerDisplay.updateHealth(MULTIPLIER * userData.stats.hitPoints.value, MULTIPLIER * userData.stats.hitPoints.value);
+    this.playerDisplay.updateShield(MULTIPLIER * userData.stats.defense.value, MULTIPLIER * userData.stats.defense.value);
   }
 }

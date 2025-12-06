@@ -8,6 +8,7 @@ export interface SlotMachineSceneOptions {
   maxRerolls?: number;
   stats?: Array<{ key: string; label: string; initialValue?: number }>;
   onNext?: () => void;
+  onRoll?: () => void;
 }
 
 /**
@@ -21,6 +22,7 @@ export class SlotMachineScene extends Container {
   private rerollText!: Text;
   private nextButton!: ImageButton;
   private onNext?: () => void;
+  private onRoll?: () => void;
 
   constructor(options: SlotMachineSceneOptions) {
     super();
@@ -29,11 +31,13 @@ export class SlotMachineScene extends Container {
     this.maxRerolls = options.maxRerolls ?? 3;
     this.rerollsRemaining = this.maxRerolls;
     this.onNext = options.onNext;
+    this.onRoll = options.onRoll;
 
     // Create single slot machine with click handler
     this.slotMachine = new SlotMachine({
       onRollComplete: (value) => {
         console.log(`Slot machine rolled: ${value}`);
+        this.onRoll && this.onRoll();
       },
       onClick: () => this.rollStats(),
     });

@@ -19,7 +19,7 @@ export class Reel extends Container {
   constructor(options: ReelOptions) {
     super();
 
-    this.values = options.values || [1, 2, 3, 4, 5, 6];
+    this.values = options.values || [1, 2, 3, 4, 5, 6, 7, 8, 9];
     this.symbolHeight = options.height;
 
     // Create mask

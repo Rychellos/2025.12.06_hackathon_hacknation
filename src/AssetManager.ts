@@ -31,6 +31,18 @@ export const bossbackground: Texture = await Assets.load(
   (await import("./assets/casinoBG.png")).default,
 );
 
+export const rock: Texture = await Assets.load(
+  (await import("./assets/kamien.png")).default,
+);
+
+export const paper: Texture = await Assets.load(
+  (await import("./assets/papier.png")).default,
+);
+
+export const scissors: Texture = await Assets.load(
+  (await import("./assets/nozyce.png")).default,
+);
+
 // Load the sprite sheet texture
 const slotySheetTexture: Texture = await Assets.load(
   (await import("./assets/sloty-Sheet.png")).default,
