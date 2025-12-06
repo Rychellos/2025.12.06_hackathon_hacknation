@@ -11,3 +11,4 @@ export const background: Texture = await Assets.load((await import("./assets/bg.
 export const brown_slot_box: Texture = await Assets.load("/assets/brown_slot_box.png");
 export const reroll_button: Texture = await Assets.load("/assets/reroll_button.png");
 export const reroll_button_hover: Texture = await Assets.load("/assets/reroll_button_hover.png");
+export const casino_table_panel: Texture = await Assets.load("/assets/casino_table_panel.png");
