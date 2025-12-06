@@ -96,40 +96,10 @@ export class SlotMachine extends Container {
 
     // Start spinning all reels
     this.reels.forEach((reel, index) => {
-      // Find index of target value
-      // BetterReel.spin takes targetIndex? No, I implemented logic to handle it internally or just spin.
-      // But wait, BetterReel.spin(targetIndex) uses that index to calculate targetPos.
-      // We need to pass the index of the value in the values array.
-      // values are [1, 2, 3, 4, 5, 6]
       const val = this.targetRolls[index];
-      const valIndex = val - 1; // 1-based to 0-based index
+      const valIndex = val - 1;
 
-      // We need to pass this index to spin so it lands on it.
-      // But BetterReel.spin implementation I wrote:
-      // if (targetIndex !== undefined) targetPos += ...
-      // It didn't strictly enforce landing on that index, just added random offset.
-      // I need to fix BetterReel.spin to actually target the index if I want precise control.
-      // However, for now, let's just call spin() and see.
-      // Wait, the user wants "incorporate these working reels".
-      // The snippet had `target = r.position + ...`.
-      // My BetterReel refactor has `targetPos = currentIdx + ...`.
-
-      // If I want to force a result, I need to calculate the exact target position.
-      // targetPos should be such that (targetPos % totalSymbols) == targetIndex (roughly).
-      // Actually, `s.y = ((this.reelPosition + j) % totalSymbols)...`
-      // We want the target symbol to be at a specific y (e.g. 0 or middle).
-
-      // Let's just let it spin randomly for now as the snippet did,
-      // OR if I want to enforce the game logic (results matter), I must control it.
-      // The game logic `this.targetRolls` MUST match what is shown.
-
-      // So I DO need to pass the target index.
-      // And I need to update BetterReel to respect it.
-
-      // Let's pass the index and I will update BetterReel in next step if needed.
-      // But I should probably update BetterReel FIRST if I want it to work.
-      // Actually, let's just pass it for now.
-      reel.spin(valIndex); // Stagger start slightly
+      reel.spin(valIndex);
     });
   }
 
