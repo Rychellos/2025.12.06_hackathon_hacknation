@@ -1,9 +1,14 @@
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
+<<<<<<< HEAD:src/MainMenuScene.ts
 import { MenuButton } from './MenuButton';
 
 
 import { CombatScene } from './views/CombatScene';
 import { LevelSelectScene } from './views/LevelSelectScene';
+=======
+import { MenuButton } from '../MenuButton';
+import { CharacterScreenScene } from './CharacterScreenScene';
+>>>>>>> master:src/scenes/MainMenuScene.ts
 
 /**
  * Main menu scene for the game
