@@ -18,7 +18,6 @@ export class SlotMachineScene extends Container {
     private slotMachine: SlotMachine;
     private rerollsRemaining: number;
     private maxRerolls: number;
-    private rerollButton!: ImageButton;
     private rerollText!: Text;
     private nextButton!: ImageButton;
     private onNext?: () => void;
@@ -31,37 +30,17 @@ export class SlotMachineScene extends Container {
         this.rerollsRemaining = this.maxRerolls;
         this.onNext = options.onNext;
 
-        // Create single slot machine
+        // Create single slot machine with click handler
         this.slotMachine = new SlotMachine({
             onRollComplete: (value) => {
                 console.log(`Slot machine rolled: ${value}`);
             },
+            onClick: () => this.rollStats(),
         });
         this.slotMachine.position.set(0, 0); // Position relative to container center
         this.addChild(this.slotMachine);
 
-        this.createRerollButton();
-        this.createNextButton();
-
-        // Start update loop
-        this.app.ticker.add(this.update, this);
-    }
-
-    private createRerollButton(): void {
-        const buttonY = 120; // Position below slot machine
-
-        // Reroll Button
-        this.rerollButton = new ImageButton({
-            texture: reroll_button,
-            hoverTexture: reroll_button_hover,
-            width: 200,
-            height: 60,
-            onClick: () => this.rollStats(),
-        });
-        this.rerollButton.position.set(-110, buttonY);
-        this.addChild(this.rerollButton);
-
-        // Rerolls remaining text
+        // Create rerolls remaining text
         const rerollStyle = new TextStyle({
             fontFamily: 'Arial, sans-serif',
             fontSize: 18,
@@ -74,15 +53,23 @@ export class SlotMachineScene extends Container {
             text: `Rerolls: ${this.rerollsRemaining}/${this.maxRerolls}`,
             style: rerollStyle,
         });
-        this.rerollText.anchor.set(0.5);
-        this.rerollText.position.set(-10, buttonY - 30);
+        this.rerollText.anchor.set(0.5, 0); // Anchor at top center of text
+
+        // Position at top center of the slot machine
+        const slotMachineWidth = this.slotMachine.width;
+        this.rerollText.position.set(slotMachineWidth / 2, -10); // Centered, slightly above
         this.addChild(this.rerollText);
+
+        this.createNextButton();
+
+        // Start update loop
+        this.app.ticker.add(this.update, this);
     }
 
     private createNextButton(): void {
-        const buttonY = 120;
+        const buttonY = 150;
 
-        // Next Button
+        // Next Button - centered
         this.nextButton = new ImageButton({
             texture: reroll_button,
             hoverTexture: reroll_button_hover,
@@ -94,7 +81,7 @@ export class SlotMachineScene extends Container {
                 }
             },
         });
-        this.nextButton.position.set(110, buttonY);
+        this.nextButton.position.set(-100, buttonY); // Centered
         this.addChild(this.nextButton);
 
         // Add "NEXT" label
@@ -109,7 +96,7 @@ export class SlotMachineScene extends Container {
             }),
         });
         nextLabel.anchor.set(0.5);
-        nextLabel.position.set(210, buttonY + 30);
+        nextLabel.position.set(0, buttonY + 30); // Centered
         this.addChild(nextLabel);
     }
 
@@ -129,12 +116,9 @@ export class SlotMachineScene extends Container {
         this.rerollsRemaining--;
         this.rerollText.text = `Rerolls: ${this.rerollsRemaining}/${this.maxRerolls}`;
 
-        if (this.rerollsRemaining === 0) {
-            this.rerollButton.alpha = 0.5;
-            this.rerollButton.eventMode = 'none';
-        }
-
-        this.slotMachine.roll();
+        // Pass target frame: 4 (5th sprite) if no rerolls left, 0 otherwise
+        const targetFrame = this.rerollsRemaining === 0 ? 4 : 0;
+        this.slotMachine.roll(targetFrame);
     }
 
     /**
