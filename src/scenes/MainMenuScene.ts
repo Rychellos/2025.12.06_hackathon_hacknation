@@ -4,6 +4,8 @@ import { LevelSelectScene } from './LevelSelectScene';
 import { MenuButton } from '../MenuButton';
 import { SlotMachineScene } from './SlotMachineScene';
 import UserData from '../data/UsersCharacter';
+import { ImageButton } from '../components/ImageButton';
+import { playButton, rankingButton, settingsButton } from '../AssetManager';
 
 /**
  * Main menu scene for the game
@@ -16,9 +18,9 @@ export class MainMenuScene extends Container {
     // UI Elements
     private background!: Graphics;
     private title!: Text;
-    private playButton!: MenuButton;
-    private settingsButton!: MenuButton;
-    private quitButton!: MenuButton;
+    private playButton!: ImageButton;
+    private settingsButton!: ImageButton;
+    private rankingButton!: ImageButton;
 
     constructor(app: Application, onPlayClick?: () => void) {
         super();
@@ -112,10 +114,11 @@ export class MainMenuScene extends Container {
 
     private createButtons(): void {
         // Play Button
-        this.playButton = new MenuButton({
-            label: '▶ PLAY',
+        this.playButton = new ImageButton({
+            label: "",
             onClick: () => {
                 console.log('Play button clicked!');
+
                 if (this.onPlayClick) {
                     this.onPlayClick();
                 } else {
@@ -167,32 +170,33 @@ export class MainMenuScene extends Container {
                     }, 500);
                 }
             },
+            texture: playButton
         });
+
         this.addChild(this.playButton);
 
-
-
         // Settings Button
-        this.settingsButton = new MenuButton({
-            label: '⚙ SETTINGS',
+        this.settingsButton = new ImageButton({
+            label: '',
             onClick: () => {
                 console.log('Settings button clicked!');
                 alert('Opening settings...');
             },
+            texture: settingsButton
         });
         this.addChild(this.settingsButton);
 
-        // Quit Button
-        this.quitButton = new MenuButton({
-            label: '✖ QUIT',
+        // Ranking Button
+        this.rankingButton = new ImageButton({
+            label: '',
             onClick: () => {
-                console.log('Quit button clicked!');
-                if (confirm('Are you sure you want to quit?')) {
-                    alert('Thanks for playing!');
-                }
+                console.log('Ranking button clicked!');
+
+                alert('View ranks!');
             },
+            texture: rankingButton
         });
-        this.addChild(this.quitButton);
+        this.addChild(this.rankingButton);
 
         // Position buttons
         this.positionButtons();
@@ -205,7 +209,7 @@ export class MainMenuScene extends Container {
 
         this.playButton.position.set(centerX - this.playButton.width / 2, startY);
         this.settingsButton.position.set(centerX - this.settingsButton.width / 2, startY + spacing);
-        this.quitButton.position.set(centerX - this.quitButton.width / 2, startY + spacing * 2);
+        this.rankingButton.position.set(centerX - this.rankingButton.width / 2, startY + spacing * 2);
     }
 
     private update(): void {
