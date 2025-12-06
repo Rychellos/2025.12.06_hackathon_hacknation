@@ -1,15 +1,15 @@
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
-import { MenuButton } from './MenuButton';
-import { StatDisplay } from './components/StatDisplay';
-import { Character, generateRandomStats } from './CharacterUtils';
+import { MenuButton } from '../MenuButton';
+import { Character } from '../CharacterUtils';
+import { SlotMachineScene } from './SlotMachineScene';
 
 /**
- * Character creation scene
+ * Enhanced character creation scene with slot machines
  */
 export class CharacterCreationScene extends Container {
     private app: Application;
     private character: Character;
-    private statDisplays: Map<string, StatDisplay> = new Map();
+    private slotMachineScene!: SlotMachineScene;
     private onComplete?: (character: Character) => void;
     private onBack?: () => void;
 
@@ -19,16 +19,25 @@ export class CharacterCreationScene extends Container {
         this.onComplete = onComplete;
         this.onBack = onBack;
 
-        // Generate initial stats
+        // Initialize character with default stats
         this.character = {
-            stats: generateRandomStats(),
+            stats: {
+                attack: { label: 'Attack', value: 10 },
+                defense: { label: 'Defense', value: 10 },
+                hitPoints: { label: 'Hit Points', value: 10 },
+            },
         };
 
         this.createBackground();
         this.createTitle();
-        this.createStatDisplays();
+        this.createSlotMachineScene();
         this.createButtons();
         this.createInstructions();
+
+        // Automatically start rolling on load
+        setTimeout(() => {
+            this.slotMachineScene.performInitialRoll();
+        }, 500);
     }
 
     private createBackground(): void {
@@ -75,42 +84,35 @@ export class CharacterCreationScene extends Container {
         this.addChild(title);
     }
 
-    private createStatDisplays(): void {
-        const stats = [
-            { key: 'strength', label: 'Strength', value: this.character.stats.strength },
-            { key: 'dexterity', label: 'Dexterity', value: this.character.stats.dexterity },
-            { key: 'constitution', label: 'Constitution', value: this.character.stats.constitution },
-            { key: 'intelligence', label: 'Intelligence', value: this.character.stats.intelligence },
-            { key: 'charisma', label: 'Charisma', value: this.character.stats.charisma },
-        ];
-
-        const startX = this.app.screen.width / 2 - 130;
-        const startY = 160;
-        const spacing = 65;
-
-        stats.forEach((stat, index) => {
-            const display = new StatDisplay({
-                label: stat.label,
-                value: stat.value,
-            });
-            display.position.set(startX, startY + index * spacing);
-            this.addChild(display);
-            this.statDisplays.set(stat.key, display);
+    private createSlotMachineScene(): void {
+        this.slotMachineScene = new SlotMachineScene({
+            app: this.app,
+            maxRerolls: 3,
+            stats: [
+                { key: 'attack', label: 'Attack', initialValue: 10 },
+                { key: 'defense', label: 'Defense', initialValue: 10 },
+                { key: 'hitPoints', label: 'Hit Points', initialValue: 10 },
+            ],
+            onStatsUpdate: (stats) => {
+                // Update character stats when rolls complete
+                this.character.stats.attack.value = stats.attack;
+                this.character.stats.defense.value = stats.defense;
+                this.character.stats.hitPoints.value = stats.hitPoints;
+                console.log('Character stats updated:', this.character.stats);
+            },
         });
+
+        // Position the slot machine scene
+        const startX = this.app.screen.width / 2 - 140;
+        const startY = 180;
+        this.slotMachineScene.position.set(startX, startY);
+
+        this.addChild(this.slotMachineScene);
     }
 
     private createButtons(): void {
         const centerX = this.app.screen.width / 2;
         const bottomY = this.app.screen.height - 150;
-
-        // Roll Stats Button
-        const rollButton = new MenuButton({
-            label: '🎲 ROLL STATS',
-            width: 200,
-            onClick: () => this.rollStats(),
-        });
-        rollButton.position.set(centerX - 230, bottomY);
-        this.addChild(rollButton);
 
         // Accept Button
         const acceptButton = new MenuButton({
@@ -123,7 +125,7 @@ export class CharacterCreationScene extends Container {
                 }
             },
         });
-        acceptButton.position.set(centerX - 90 + 10, bottomY);
+        acceptButton.position.set(centerX - 90, bottomY);
         this.addChild(acceptButton);
 
         // Back Button
@@ -136,7 +138,7 @@ export class CharacterCreationScene extends Container {
                 }
             },
         });
-        backButton.position.set(centerX + 100 + 20, bottomY);
+        backButton.position.set(centerX + 100, bottomY);
         this.addChild(backButton);
     }
 
@@ -149,34 +151,11 @@ export class CharacterCreationScene extends Container {
         });
 
         const instructions = new Text({
-            text: 'Roll stats using 4d6 drop lowest method\nClick ROLL STATS to generate new random stats',
+            text: 'Each stat is rolled using 4d6 drop lowest\nYou have 3 rerolls to get the stats you want!',
             style: instructionStyle,
         });
         instructions.anchor.set(0.5);
         instructions.position.set(this.app.screen.width / 2, this.app.screen.height - 80);
         this.addChild(instructions);
-    }
-
-    private rollStats(): void {
-        // Generate new stats
-        this.character.stats = generateRandomStats();
-
-        // Update all displays with animation
-        const statKeys: (keyof typeof this.character.stats)[] = [
-            'strength',
-            'dexterity',
-            'constitution',
-            'intelligence',
-            'charisma',
-        ];
-
-        statKeys.forEach((key, index) => {
-            setTimeout(() => {
-                const display = this.statDisplays.get(key);
-                if (display) {
-                    display.updateValue(this.character.stats[key]);
-                }
-            }, index * 50); // Stagger the updates for effect
-        });
     }
 }

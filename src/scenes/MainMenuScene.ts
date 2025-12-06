@@ -1,7 +1,6 @@
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
-import { MenuButton } from './MenuButton';
-import { StatDisplay } from './components/StatDisplay';
-import { CharacterScreenScene } from './views/CharacterScreenScene';
+import { MenuButton } from '../MenuButton';
+import { CharacterScreenScene } from './CharacterScreenScene';
 
 /**
  * Main menu scene for the game
