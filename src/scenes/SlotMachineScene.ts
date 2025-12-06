@@ -6,8 +6,7 @@ import { reroll_button, reroll_button_hover } from '../AssetManager';
 export interface SlotMachineSceneOptions {
     app: Application;
     maxRerolls?: number;
-    stats: Array<{ key: string; label: string; initialValue?: number }>;
-    onStatsUpdate?: (stats: Record<string, number>) => void;
+    stats?: Array<{ key: string; label: string; initialValue?: number }>;
     onNext?: () => void;
 }
 
@@ -16,16 +15,13 @@ export interface SlotMachineSceneOptions {
  */
 export class SlotMachineScene extends Container {
     private app: Application;
-    private slotMachines: Map<string, SlotMachine> = new Map();
+    private slotMachine: SlotMachine;
     private rerollsRemaining: number;
     private maxRerolls: number;
     private rerollButton!: ImageButton;
     private rerollText!: Text;
     private nextButton!: ImageButton;
-    private anyRolling = false;
-    private onStatsUpdate?: (stats: Record<string, number>) => void;
     private onNext?: () => void;
-    private currentStats: Record<string, number> = {};
 
     constructor(options: SlotMachineSceneOptions) {
         super();
@@ -33,10 +29,17 @@ export class SlotMachineScene extends Container {
         this.app = options.app;
         this.maxRerolls = options.maxRerolls ?? 3;
         this.rerollsRemaining = this.maxRerolls;
-        this.onStatsUpdate = options.onStatsUpdate;
         this.onNext = options.onNext;
 
-        this.createSlotMachines(options.stats);
+        // Create single slot machine
+        this.slotMachine = new SlotMachine({
+            onRollComplete: (value) => {
+                console.log(`Slot machine rolled: ${value}`);
+            },
+        });
+        this.slotMachine.position.set(0, 0); // Position relative to container center
+        this.addChild(this.slotMachine);
+
         this.createRerollButton();
         this.createNextButton();
 
@@ -44,35 +47,8 @@ export class SlotMachineScene extends Container {
         this.app.ticker.add(this.update, this);
     }
 
-    private createSlotMachines(stats: Array<{ key: string; label: string; initialValue?: number }>): void {
-        const spacing = 120;
-
-        stats.forEach((stat, index) => {
-            const slotMachine = new SlotMachine({
-                label: stat.label,
-                onRollComplete: (value) => {
-                    this.currentStats[stat.key] = value;
-                    console.log(`${stat.label} rolled: ${value}`);
-
-                    // Notify parent if all slots finished rolling
-                    if (!this.anyRolling && this.onStatsUpdate) {
-                        this.onStatsUpdate(this.currentStats);
-                    }
-                },
-            });
-
-            slotMachine.position.set(0, index * spacing);
-            slotMachine.setValue(stat.initialValue ?? 10);
-            this.currentStats[stat.key] = stat.initialValue ?? 10;
-
-            this.addChild(slotMachine);
-            this.slotMachines.set(stat.key, slotMachine);
-        });
-    }
-
     private createRerollButton(): void {
-        const totalHeight = this.slotMachines.size * 120;
-        const buttonY = totalHeight + 20;
+        const buttonY = 120; // Position below slot machine
 
         // Reroll Button
         this.rerollButton = new ImageButton({
@@ -104,8 +80,7 @@ export class SlotMachineScene extends Container {
     }
 
     private createNextButton(): void {
-        const totalHeight = this.slotMachines.size * 120;
-        const buttonY = totalHeight + 20;
+        const buttonY = 120;
 
         // Next Button
         this.nextButton = new ImageButton({
@@ -147,7 +122,7 @@ export class SlotMachineScene extends Container {
             return;
         }
 
-        if (this.anyRolling) {
+        if (this.slotMachine.getRolling()) {
             return;
         }
 
@@ -159,25 +134,14 @@ export class SlotMachineScene extends Container {
             this.rerollButton.eventMode = 'none';
         }
 
-        // Start rolling with stagger
-        const slots = Array.from(this.slotMachines.values());
-        slots.forEach((slot, index) => {
-            setTimeout(() => {
-                slot.roll();
-            }, index * 150);
-        });
+        this.slotMachine.roll();
     }
 
     /**
      * Perform initial roll (doesn't count against reroll limit)
      */
     public performInitialRoll(): void {
-        const slots = Array.from(this.slotMachines.values());
-        slots.forEach((slot, index) => {
-            setTimeout(() => {
-                slot.roll();
-            }, index * 150);
-        });
+        this.slotMachine.roll();
     }
 
     /**
@@ -187,28 +151,8 @@ export class SlotMachineScene extends Container {
         return this.rerollsRemaining;
     }
 
-    /**
-     * Get current stats
-     */
-    public getCurrentStats(): Record<string, number> {
-        return { ...this.currentStats };
-    }
-
-    /**
-     * Check if any slot machine is rolling
-     */
-    public isRolling(): boolean {
-        return this.anyRolling;
-    }
-
     private update(time: any): void {
-        this.anyRolling = false;
-        this.slotMachines.forEach((slot) => {
-            slot.update(time.deltaTime);
-            if (slot.getRolling()) {
-                this.anyRolling = true;
-            }
-        });
+        this.slotMachine.update(time.deltaTime);
     }
 
     destroy(options?: any): void {

@@ -1,5 +1,6 @@
 import { Application, Container, Text, TextStyle, Graphics } from "pixi.js";
 import { MenuButton } from "../MenuButton";
+import { SlotMachineScene } from "./SlotMachineScene";
 
 import { LevelSelectScene } from "./LevelSelectScene";
 
@@ -17,6 +18,7 @@ export class CombatScene extends Container {
 
         this.createBackground();
         this.createUI();
+        this.showSlotMachine();
     }
 
     private createBackground(): void {
@@ -130,5 +132,32 @@ export class CombatScene extends Container {
             this.resultText.text = "YOU LOSE!";
             this.resultText.style.fill = '#ef4444'; // Red
         }
+    }
+
+    private showSlotMachine(): void {
+        // Create a semi-transparent overlay background for the slot machine
+        const overlay = new Graphics();
+        overlay.rect(0, 0, this.app.screen.width, this.app.screen.height);
+        overlay.fill({ color: 0x000000, alpha: 0.7 });
+        this.addChild(overlay);
+
+        const slotMachineScene = new SlotMachineScene({
+            app: this.app,
+            onNext: () => {
+                this.removeChild(overlay);
+                this.removeChild(slotMachineScene);
+            }
+        });
+
+        // Center the slot machine scene
+        slotMachineScene.position.set(
+            this.app.screen.width / 2,
+            this.app.screen.height / 2 - 100 // Slightly offset up
+        );
+
+        this.addChild(slotMachineScene);
+
+        // Initial auto-roll
+        slotMachineScene.performInitialRoll();
     }
 }
