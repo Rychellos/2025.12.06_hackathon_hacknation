@@ -9,6 +9,18 @@ export const getData = () => {
     return data;
 }
 
+export const setAttack = (value: number) => {
+    data.stats.attack.value = value;
+}
+
+export const setDefense = (value: number) => {
+    data.stats.defense.value = value;
+}
+
+export const setHitPoints = (value: number) => {
+    data.stats.hitPoints.value = value;
+}
+
 setInterval(() => {
     const newStats = generateRandomStats()
     data.stats.attack.value = newStats.attack.value;
@@ -17,5 +29,8 @@ setInterval(() => {
 }, 1000);
 
 export default {
-    getData
+    getData,
+    setAttack,
+    setDefense,
+    setHitPoints
 }

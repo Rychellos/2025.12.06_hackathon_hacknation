@@ -11,6 +11,13 @@ export class MainMenuScene extends Container {
     private particles: Graphics[] = [];
     private onPlayClick?: () => void;
 
+    // UI Elements
+    private background!: Graphics;
+    private title!: Text;
+    private playButton!: MenuButton;
+    private settingsButton!: MenuButton;
+    private quitButton!: MenuButton;
+
     constructor(app: Application, onPlayClick?: () => void) {
         super();
         this.app = app;
@@ -23,15 +30,23 @@ export class MainMenuScene extends Container {
 
         // Start animation loop
         this.app.ticker.add(this.update.bind(this));
+
+        // Listen for resize events
+        window.addEventListener('resize', this.onResize);
     }
 
     private createBackground(): void {
-        const bg = new Graphics();
-        bg.rect(0, 0, this.app.screen.width, this.app.screen.height);
-        bg.fill({
+        this.background = new Graphics();
+        this.updateBackground();
+        this.addChild(this.background);
+    }
+
+    private updateBackground(): void {
+        this.background.clear();
+        this.background.rect(0, 0, this.app.screen.width, this.app.screen.height);
+        this.background.fill({
             color: 0x0a0e27,
         });
-        this.addChild(bg);
     }
 
     private createParticles(): void {
@@ -72,30 +87,30 @@ export class MainMenuScene extends Container {
             },
         });
 
-        const title = new Text({
+        this.title = new Text({
             text: 'EPIC GAME',
             style: titleStyle,
         });
-        title.anchor.set(0.5);
-        title.position.set(this.app.screen.width / 2, 150);
+        this.title.anchor.set(0.5);
+        this.positionTitle();
 
-        this.addChild(title);
+        this.addChild(this.title);
 
         // Add pulse animation to title
         let elapsed = 0;
         this.app.ticker.add((time) => {
             elapsed += time.deltaTime * 0.05;
-            title.scale.set(1 + Math.sin(elapsed) * 0.05);
+            this.title.scale.set(1 + Math.sin(elapsed) * 0.05);
         });
     }
 
-    private createButtons(): void {
-        const centerX = this.app.screen.width / 2;
-        const startY = this.app.screen.height / 2 + 50;
-        const spacing = 80;
+    private positionTitle(): void {
+        this.title.position.set(this.app.screen.width / 2, 150);
+    }
 
+    private createButtons(): void {
         // Play Button
-        const playButton = new MenuButton({
+        this.playButton = new MenuButton({
             label: '▶ PLAY',
             onClick: () => {
                 console.log('Play button clicked!');
@@ -103,27 +118,24 @@ export class MainMenuScene extends Container {
                     this.onPlayClick();
                 } else {
                     this.destroy();
-
-                    this.app.stage.addChild(new CharacterScreenScene(this.app))
+                    this.app.stage.addChild(new CharacterScreenScene(this.app));
                 }
             },
         });
-        playButton.position.set(centerX - playButton.width / 2, startY);
-        this.addChild(playButton);
+        this.addChild(this.playButton);
 
         // Settings Button
-        const settingsButton = new MenuButton({
+        this.settingsButton = new MenuButton({
             label: '⚙ SETTINGS',
             onClick: () => {
                 console.log('Settings button clicked!');
                 alert('Opening settings...');
             },
         });
-        settingsButton.position.set(centerX - settingsButton.width / 2, startY + spacing);
-        this.addChild(settingsButton);
+        this.addChild(this.settingsButton);
 
         // Quit Button
-        const quitButton = new MenuButton({
+        this.quitButton = new MenuButton({
             label: '✖ QUIT',
             onClick: () => {
                 console.log('Quit button clicked!');
@@ -132,8 +144,20 @@ export class MainMenuScene extends Container {
                 }
             },
         });
-        quitButton.position.set(centerX - quitButton.width / 2, startY + spacing * 2);
-        this.addChild(quitButton);
+        this.addChild(this.quitButton);
+
+        // Position buttons
+        this.positionButtons();
+    }
+
+    private positionButtons(): void {
+        const centerX = this.app.screen.width / 2;
+        const startY = this.app.screen.height / 2 + 50;
+        const spacing = 80;
+
+        this.playButton.position.set(centerX - this.playButton.width / 2, startY);
+        this.settingsButton.position.set(centerX - this.settingsButton.width / 2, startY + spacing);
+        this.quitButton.position.set(centerX - this.quitButton.width / 2, startY + spacing * 2);
     }
 
     private update(): void {
@@ -150,8 +174,21 @@ export class MainMenuScene extends Container {
         });
     }
 
+
+    private onResize = (): void => {
+        // Update background size
+        this.updateBackground();
+
+        // Reposition title
+        this.positionTitle();
+
+        // Reposition buttons
+        this.positionButtons();
+    };
+
     destroy(): void {
         this.app.ticker.remove(this.update.bind(this));
+        window.removeEventListener('resize', this.onResize);
         super.destroy();
     }
 }

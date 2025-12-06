@@ -32,7 +32,6 @@ export class CharacterScreenScene extends Container {
     }
 
     private update(): void {
-        // Animate particles
 
     }
 

@@ -95,33 +95,4 @@ export class StatDisplay extends Container {
         this.valueText.style.fill = getStatColor(this.options.value);
         this.modifierText.style.fill = modifier >= 0 ? 0xaaaaaa : 0xaaaaaa;
     }
-
-    /**
-     * Update the stat value
-     */
-    updateValue(): void {
-        // this.currentValue = newValue;
-        // this.valueText.text = newValue.toString();
-        // this.valueText.style.fill = getStatColor(newValue);
-
-        // const modifier = getStatModifier(newValue);
-        // this.modifierText.text = modifier >= 0 ? `+${modifier}` : modifier.toString();
-
-        // this.updateBackground(256, 64);
-    }
-
-    // private updateBackground(width: number, height: number): void {
-    //     this.background.clear();
-    //     this.background.roundRect(0, 0, width, height, 8);
-
-    //     this.background.fill({
-    //         color: 0x1a1a2e,
-    //     });
-
-    //     this.background.stroke({
-    //         width: 2,
-    //         color: getStatColor(this.currentValue),
-    //         alpha: 0.5,
-    //     });
-    // }
 }
