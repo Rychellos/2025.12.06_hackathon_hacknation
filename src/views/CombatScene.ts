@@ -1,6 +1,7 @@
 import { Application, Container, Text, TextStyle, Graphics } from "pixi.js";
 import { MenuButton } from "../MenuButton";
-import { MainMenuScene } from "../MainMenuScene";
+
+import { LevelSelectScene } from "./LevelSelectScene";
 
 type Choice = 'rock' | 'paper' | 'scissors';
 
@@ -102,7 +103,7 @@ export class CombatScene extends Container {
             height: 50,
             onClick: () => {
                 this.destroy();
-                this.app.stage.addChild(new MainMenuScene(this.app));
+                this.app.stage.addChild(new LevelSelectScene(this.app));
             }
         });
         backBtn.position.set(20, 20);

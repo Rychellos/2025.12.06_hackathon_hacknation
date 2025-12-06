@@ -2,6 +2,7 @@ import { Application, Container, Text, TextStyle, Graphics } from "pixi.js";
 import { MenuButton } from "../MenuButton";
 import { MainMenuScene } from "../MainMenuScene";
 import { CharacterScreenScene } from "./CharacterScreenScene";
+import { CombatScene } from "./CombatScene";
 
 export class LevelSelectScene extends Container {
     private app: Application;
@@ -136,7 +137,11 @@ export class LevelSelectScene extends Container {
             node.scale.set(0.9);
             setTimeout(() => {
                 this.destroy();
-                this.app.stage.addChild(new CharacterScreenScene(this.app));
+                if (id === 1) {
+                    this.app.stage.addChild(new CombatScene(this.app));
+                } else {
+                    this.app.stage.addChild(new CharacterScreenScene(this.app));
+                }
             }, 100);
         });
 

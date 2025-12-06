@@ -2,7 +2,6 @@ import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { MenuButton } from './MenuButton';
 
 
-import { CombatScene } from './views/CombatScene';
 import { LevelSelectScene } from './views/LevelSelectScene';
 
 /**
@@ -17,7 +16,6 @@ export class MainMenuScene extends Container {
     private background!: Graphics;
     private title!: Text;
     private playButton!: MenuButton;
-    private fightButton!: MenuButton;
     private settingsButton!: MenuButton;
     private quitButton!: MenuButton;
 
@@ -127,15 +125,7 @@ export class MainMenuScene extends Container {
         });
         this.addChild(this.playButton);
 
-        // Fight Button
-        this.fightButton = new MenuButton({
-            label: '⚔ FIGHT',
-            onClick: () => {
-                this.destroy();
-                this.app.stage.addChild(new CombatScene(this.app));
-            },
-        });
-        this.addChild(this.fightButton);
+
 
         // Settings Button
         this.settingsButton = new MenuButton({
@@ -169,9 +159,8 @@ export class MainMenuScene extends Container {
         const spacing = 80;
 
         this.playButton.position.set(centerX - this.playButton.width / 2, startY);
-        this.fightButton.position.set(centerX - this.fightButton.width / 2, startY + spacing);
-        this.settingsButton.position.set(centerX - this.settingsButton.width / 2, startY + spacing * 2);
-        this.quitButton.position.set(centerX - this.quitButton.width / 2, startY + spacing * 3);
+        this.settingsButton.position.set(centerX - this.settingsButton.width / 2, startY + spacing);
+        this.quitButton.position.set(centerX - this.quitButton.width / 2, startY + spacing * 2);
     }
 
     private update(): void {
