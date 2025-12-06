@@ -52,7 +52,7 @@ export class MainMenuScene extends Container {
         // Create floating particles in background
         for (let i = 0; i < 30; i++) {
             const particle = new Graphics();
-            const size = Math.random() * 3 + 1;
+            const size = Math.random() * 32 + 8;
             particle.circle(0, 0, size);
             particle.fill({
                 color: 0x4a90e2,
