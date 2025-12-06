@@ -36,7 +36,7 @@ export class CombatScene extends Container {
     this.background = new Background({
       height: this.app.screen.height,
       width: this.app.screen.width,
-      texture: bossBackground
+      texture: bossBackground,
     });
     // this.background.rect(0, 0, this.app.screen.width, this.app.screen.height);
     this.addChild(this.background);
@@ -262,7 +262,7 @@ export class CombatScene extends Container {
     // Center the slot machine scene
     slotMachineScene.position.set(
       this.app.screen.width / 2,
-      this.app.screen.height / 2 - 100, // Slightly offset up
+      this.app.screen.height / 2, // Slightly offset up
     );
 
     this.addChild(slotMachineScene);

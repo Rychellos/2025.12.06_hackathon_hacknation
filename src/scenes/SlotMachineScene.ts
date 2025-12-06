@@ -37,7 +37,12 @@ export class SlotMachineScene extends Container {
       },
       onClick: () => this.rollStats(),
     });
-    this.slotMachine.position.set(0, 0); // Position relative to container center
+
+    this.scale = 2
+    this.position.set(this.app.screen.width / 2, - 500)
+
+    const slotMachineWidth = this.slotMachine.width;
+    this.slotMachine.position.set(-slotMachineWidth / 2, 0); // Position relative to container center
     this.addChild(this.slotMachine);
 
     // Create rerolls remaining text
@@ -53,11 +58,11 @@ export class SlotMachineScene extends Container {
       text: `Rerolls: ${this.rerollsRemaining}/${this.maxRerolls}`,
       style: rerollStyle,
     });
+
     this.rerollText.anchor.set(0.5, 0); // Anchor at top center of text
 
     // Position at top center of the slot machine
-    const slotMachineWidth = this.slotMachine.width;
-    this.rerollText.position.set(slotMachineWidth / 2, -10); // Centered, slightly above
+    // this.rerollText.position.set(32, -10); // Centered, slightly above
     this.addChild(this.rerollText);
 
     this.createNextButton();
@@ -67,7 +72,7 @@ export class SlotMachineScene extends Container {
   }
 
   private createNextButton(): void {
-    const buttonY = 150;
+    const buttonY = 175;
 
     // Next Button - centered
     this.nextButton = new ImageButton({
@@ -81,6 +86,7 @@ export class SlotMachineScene extends Container {
         }
       },
     });
+
     this.nextButton.position.set(-100, buttonY); // Centered
     this.addChild(this.nextButton);
 
@@ -95,6 +101,7 @@ export class SlotMachineScene extends Container {
         stroke: { color: 0x000000, width: 2 },
       }),
     });
+
     nextLabel.anchor.set(0.5);
     nextLabel.position.set(0, buttonY + 30); // Centered
     this.addChild(nextLabel);

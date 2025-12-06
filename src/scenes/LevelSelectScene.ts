@@ -156,9 +156,11 @@ export class LevelSelectScene extends Container {
     node.on("pointerover", () => {
       node.scale.set(1.1);
     });
+
     node.on("pointerout", () => {
       node.scale.set(1.0);
     });
+
     node.on("pointerdown", () => {
       node.scale.set(0.9);
       setTimeout(() => {
