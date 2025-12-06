@@ -20,7 +20,6 @@ Document the reason why modification was necessary and why alternatives were ins
 
 Do not create duplicate components when a similar one already exists.
 
-
 2. General Coding Conduct
 Code Quality
 
@@ -45,3 +44,6 @@ Testing
 Add or update tests for every new function in src/lib/.
 
 Ensure that modified components remain fully testable.
+
+3. Docs
+Read the docs when situation is unclear. Remeber to build flexible components and categorize them in meaningfull way.
