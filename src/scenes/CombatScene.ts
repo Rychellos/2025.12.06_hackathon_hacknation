@@ -1,6 +1,6 @@
 import { Application, Container, Text, TextStyle, Graphics } from "pixi.js";
 import { MenuButton } from "../MenuButton";
-import { MainMenuScene } from "../MainMenuScene";
+import { MainMenuScene } from "./MainMenuScene";
 
 type Choice = 'rock' | 'paper' | 'scissors';
 

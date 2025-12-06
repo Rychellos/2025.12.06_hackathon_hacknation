@@ -1,6 +1,6 @@
 import { Application, Container, Text, TextStyle, Graphics } from "pixi.js";
 import { MenuButton } from "../MenuButton";
-import { MainMenuScene } from "../MainMenuScene";
+import { MainMenuScene } from "./MainMenuScene";
 import { CharacterScreenScene } from "./CharacterScreenScene";
 
 export class LevelSelectScene extends Container {

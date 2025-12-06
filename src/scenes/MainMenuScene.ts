@@ -1,14 +1,10 @@
 import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
-<<<<<<< HEAD:src/MainMenuScene.ts
-import { MenuButton } from './MenuButton';
 
-
-import { CombatScene } from './views/CombatScene';
-import { LevelSelectScene } from './views/LevelSelectScene';
-=======
+import { CombatScene } from './CombatScene';
+import { LevelSelectScene } from './LevelSelectScene';
 import { MenuButton } from '../MenuButton';
-import { CharacterScreenScene } from './CharacterScreenScene';
->>>>>>> master:src/scenes/MainMenuScene.ts
+import { SlotMachineScene } from './SlotMachineScene';
+import UserData from '../data/UsersCharacter';
 
 /**
  * Main menu scene for the game
@@ -126,7 +122,51 @@ export class MainMenuScene extends Container {
                     this.onPlayClick();
                 } else {
                     this.destroy();
-                    this.app.stage.addChild(new LevelSelectScene(this.app));
+
+                    // Store stats temporarily
+                    let currentStats: Record<string, number> = {
+                        attack: 10,
+                        defense: 10,
+                        hitPoints: 10,
+                    };
+
+                    const slotScene = new SlotMachineScene({
+                        app: this.app,
+                        maxRerolls: 3,
+                        stats: [
+                            { key: 'attack', label: 'Attack', initialValue: 10 },
+                            { key: 'defense', label: 'Defense', initialValue: 10 },
+                            { key: 'hitPoints', label: 'Hit Points', initialValue: 10 },
+                        ],
+                        onStatsUpdate: (stats) => {
+                            currentStats = stats;
+                            console.log('Stats updated:', stats);
+                        },
+                        onNext: () => {
+                            // Update UserData with final stats
+                            UserData.setAttack(currentStats.attack);
+                            UserData.setDefense(currentStats.defense);
+                            UserData.setHitPoints(currentStats.hitPoints);
+                            console.log('UserData updated with stats:', currentStats);
+
+                            // Navigate to Level Select
+                            slotScene.destroy();
+                            this.app.stage.addChild(new LevelSelectScene(this.app));
+                        },
+                    });
+
+                    // Center the slot scene
+                    slotScene.position.set(
+                        this.app.screen.width / 2 - 140,
+                        this.app.screen.height / 2 - 200
+                    );
+
+                    this.app.stage.addChild(slotScene);
+
+                    // Auto-start rolling
+                    setTimeout(() => {
+                        slotScene.performInitialRoll();
+                    }, 500);
                 }
             },
         });
