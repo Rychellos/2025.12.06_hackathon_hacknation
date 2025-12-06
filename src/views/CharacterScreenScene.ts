@@ -21,7 +21,7 @@ export class CharacterScreenScene extends Container {
         let i = 0;
         for (const statName in stats) {
             if (!Object.hasOwn(stats, statName)) continue;
-            const element = stats[statName];
+            const element = stats[statName as keyof typeof stats];
 
             const label = new StatDisplay(this.app, element)
 
