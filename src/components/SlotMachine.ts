@@ -1,6 +1,7 @@
 import { Container, Sprite, Texture } from "pixi.js";
 import { slotySheet } from "../AssetManager";
 import { BetterReel } from "./BetterReel";
+import UsersCharacter from "../data/UsersCharacter";
 
 export interface SlotMachineOptions {
   onRollComplete?: (value: number) => void;
@@ -136,11 +137,17 @@ export class SlotMachine extends Container {
    * Generate 3 random dice rolls
    */
   private generateRolls(): number[] {
-    return [
+    const rolls = [
       Math.floor(Math.random() * 6) + 1,
       Math.floor(Math.random() * 6) + 1,
       Math.floor(Math.random() * 6) + 1,
     ];
+
+    UsersCharacter.setAttack(rolls[0]);
+    UsersCharacter.setHitPoints(rolls[1]);
+    UsersCharacter.setDefense(rolls[2]);
+
+    return rolls
   }
 
   /**
