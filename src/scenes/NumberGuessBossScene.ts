@@ -21,6 +21,7 @@ import {
   lottoTexture,
   musicPoKrulefsku,
   slashTexture,
+  sfxSlash,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -324,6 +325,7 @@ export class NumberGuessBossScene extends Container {
 
         // Slash Animation
         SlashEffect.playOn(this.bossDisplay, slashTexture);
+        SoundManager.getInstance().playSfx(sfxSlash);
       } else {
         this.resultText.text = "WRONG!";
         this.resultText.style.fill = "#ef4444"; // Red
@@ -342,6 +344,10 @@ export class NumberGuessBossScene extends Container {
         );
         this.playerDisplay.updateHealth(result.hp);
         this.playerDisplay.updateShield(result.shield);
+
+        // Slash Animation
+        SlashEffect.playOn(this.playerDisplay, slashTexture);
+        SoundManager.getInstance().playSfx(sfxSlash);
       }
 
       // Clear result text after delay

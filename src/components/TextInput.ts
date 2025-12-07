@@ -42,14 +42,19 @@ export class TextInput extends Container {
     });
     this.labelText = new Text({ text: this.options.label, style: labelStyle });
     this.labelText.position.set(0, -25);
-    this.labelText.eventMode = 'none'; // Don't intercept clicks
+    this.labelText.eventMode = "none"; // Don't intercept clicks
     this.addChild(this.labelText);
 
     // Background
     this.background = new Graphics();
     this.drawBackground(false);
     // Set explicit hit area for immediate interaction
-    this.background.hitArea = new Rectangle(0, 0, this.options.width, this.options.height);
+    this.background.hitArea = new Rectangle(
+      0,
+      0,
+      this.options.width,
+      this.options.height,
+    );
     this.addChild(this.background);
 
     // Placeholder
@@ -65,7 +70,7 @@ export class TextInput extends Container {
     });
     this.placeholderText.anchor.set(0, 0.5);
     this.placeholderText.position.set(10, this.options.height / 2);
-    this.placeholderText.eventMode = 'none'; // Don't intercept clicks
+    this.placeholderText.eventMode = "none"; // Don't intercept clicks
     this.addChild(this.placeholderText);
 
     // Input Text
@@ -77,7 +82,7 @@ export class TextInput extends Container {
     this.inputText = new Text({ text: "", style: inputStyle });
     this.inputText.anchor.set(0, 0.5);
     this.inputText.position.set(10, this.options.height / 2);
-    this.inputText.eventMode = 'none'; // Don't intercept clicks
+    this.inputText.eventMode = "none"; // Don't intercept clicks
     this.addChild(this.inputText);
 
     // Cursor
@@ -86,7 +91,7 @@ export class TextInput extends Container {
     this.cursorGraphics.fill({ color: 0xffffff });
     this.cursorGraphics.position.set(10, this.options.height / 2 - 12);
     this.cursorGraphics.visible = false;
-    this.cursorGraphics.eventMode = 'none'; // Don't intercept clicks
+    this.cursorGraphics.eventMode = "none"; // Don't intercept clicks
     this.addChild(this.cursorGraphics);
 
     // Make container interactive for proper event handling

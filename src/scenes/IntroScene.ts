@@ -61,7 +61,7 @@ export class IntroScene extends Container {
 
       // Play video
       if (this.videoSource && !introPlayed) {
-        introPlayed = true
+        introPlayed = true;
         this.videoSource.currentTime = 0;
         this.videoSource.muted = false; // Enable sound
         this.videoSource.loop = false;

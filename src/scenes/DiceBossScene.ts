@@ -301,7 +301,6 @@ export class DiceBossScene extends Container {
     this.actionContainer.visible = true;
     this.showMessage("Twoja kolej");
 
-
     setTimeout(() => this.rollDice(), 1000);
   }
 
@@ -309,7 +308,6 @@ export class DiceBossScene extends Container {
   private async rollDice(): Promise<void> {
     if (this.isAnimating) return;
     this.isAnimating = true;
-
 
     const toRoll = this.dice.filter((d) => !d.banked && !d.held);
 
@@ -407,9 +405,7 @@ export class DiceBossScene extends Container {
   private actionPass(): void {
     if (!this.isPlayerTurn || this.isAnimating) return;
 
-
     const selectedDice = this.dice.filter((d) => d.held);
-
 
     let finalAddScore = 0;
     if (selectedDice.length > 0) {
@@ -442,13 +438,14 @@ export class DiceBossScene extends Container {
 
     if (score > 0) {
       const damage = Math.ceil(score / 10);
-      this.showMessage(`Atakuje! ${damage} punktów obrażeń`, "#4ade80");
+      this.showMessage(`Zadajesz ${damage} punktów obrażeń!`, "#4ade80");
 
       const result = CombatUtils.applyDamage(
         this.bossDisplay.hp,
         this.bossDisplay.shield,
         damage,
       );
+
       this.bossDisplay.updateHealth(result.hp);
       this.bossDisplay.updateShield(result.shield);
 
@@ -477,13 +474,16 @@ export class DiceBossScene extends Container {
     const rand = Math.random();
     let damage = 5;
 
-    if (rand < 0.40) damage = 5;
-    else if (rand < 0.70) damage = 10;
+    if (rand < 0.4) damage = 5;
+    else if (rand < 0.7) damage = 10;
     else if (rand < 0.85) damage = 20;
     else if (rand < 0.95) damage = 35;
     else damage = 50;
 
-    this.showMessage(`Przeciwnik atakuje! ${damage} punktów obrażeń`, "#ef4444");
+    this.showMessage(
+      `Przeciwnik zadał Ci ${damage} punktów obrażeń`,
+      "#ef4444",
+    );
 
     // Boss Attack Animation
     this.bossDisplay.playAnimation(bossAttackTexture);
@@ -493,6 +493,9 @@ export class DiceBossScene extends Container {
       this.playerDisplay.shield,
       damage,
     );
+
+    SlashEffect.playOn(this.playerDisplay, slashTexture);
+    SoundManager.getInstance().playSfx(sfxSlash);
     this.playerDisplay.updateHealth(result.hp);
     this.playerDisplay.updateShield(result.shield);
 
