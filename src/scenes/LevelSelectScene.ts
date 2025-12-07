@@ -100,10 +100,63 @@ export class LevelSelectScene extends Container {
       node.scale.set(1.0);
     });
     node.on("pointerdown", () => {
-      node.scale.set(0.9);
-      setTimeout(() => {
-        this.app.stage.removeChild(this);
+      this.handleLevelSelect(id, node);
+    });
+
+    this.nodesLayer.addChild(node);
+  }
+
+  private handleLevelSelect(id: number, node: Container): void {
+    if (this.nodesLayer.eventMode === "none") return; // Prevent double clicks
+
+    // Disable interaction
+    this.nodesLayer.eventMode = "none";
+
+    // Create overlay on Stage so it doesn't zoom with the scene
+    const overlay = new Graphics();
+    overlay.rect(0, 0, this.app.screen.width, this.app.screen.height);
+    overlay.fill({ color: 0x000000, alpha: 0 });
+    this.app.stage.addChild(overlay);
+
+    const startScale = this.scale.x;
+    const targetScale = 4;
+
+    const startX = this.x;
+    const startY = this.y;
+
+    // Target position: centering the clicked node
+    // Formula: ScreenCenter - NodePos * Scale
+    const targetX = this.app.screen.width / 2 - node.x * targetScale;
+    const targetY = this.app.screen.height / 2 - node.y * targetScale;
+
+    let progress = 0;
+    const duration = 60; // frames
+
+    const animate = () => {
+      progress++;
+      const t = progress / duration;
+      const ease = t * t * (3 - 2 * t); // Smooth step
+
+      // Interpolate Scale
+      const currentScale = startScale + (targetScale - startScale) * ease;
+      this.scale.set(currentScale);
+
+      // Interpolate Position
+      this.x = startX + (targetX - startX) * ease;
+      this.y = startY + (targetY - startY) * ease;
+
+      // Fade in overlay
+      overlay.alpha = ease;
+
+      if (progress >= duration) {
+        this.app.ticker.remove(animate);
         this.destroy();
+        overlay.removeFromParent(); // Remove this overlay, next scene should handle fade in or we leave it?
+        // User wants "darkens and THEN undarkens".
+        // If we remove it now, screen might flash if next scene isn't ready or doesn't have black bg.
+        // Better to pass it? Or just trust next scene creates its own.
+        // Let's destroy it and assume next scene starts black.
+
         if (id === 1) {
           this.app.stage.addChild(new CombatScene(this.app));
         } else if (id === 2) {
@@ -113,20 +166,19 @@ export class LevelSelectScene extends Container {
         } else {
           this.app.stage.addChild(new CharacterScreenScene(this.app));
         }
-      }, 100);
-    });
+      }
+    };
 
-    this.nodesLayer.addChild(node);
+    this.app.ticker.add(animate);
   }
 
   private createUI(): void {
     // Back Button
     const backBtn = new MenuButton({
-      label: "BACK",
+      label: "COFNIJ",
       width: 120,
       height: 50,
       onClick: () => {
-        this.app.stage.removeChild(this);
         this.destroy();
         this.app.stage.addChild(new MainMenuScene(this.app));
       },
