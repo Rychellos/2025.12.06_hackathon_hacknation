@@ -1,6 +1,6 @@
 import { Application, Container, Graphics, Sprite } from "pixi.js";
 
-import { LevelSelectScene } from "./LevelSelectScene";
+import { IntroScene } from "./IntroScene";
 import { ImageButton } from "../components/ImageButton";
 import {
   background,
@@ -112,7 +112,7 @@ export class MainMenuScene extends Container {
           this.onPlayClick();
         } else {
           this.destroy();
-          this.app.stage.addChild(new LevelSelectScene(this.app));
+          this.app.stage.addChild(new IntroScene(this.app));
         }
       },
       texture: playButton,

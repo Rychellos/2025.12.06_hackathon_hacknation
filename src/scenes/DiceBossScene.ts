@@ -57,6 +57,25 @@ export class DiceBossScene extends Container {
     this.createUI();
     this.showSlotMachine();
     this.initializeGame();
+    this.showTransition();
+  }
+
+  private showTransition(): void {
+    const overlay = new Graphics();
+    overlay.rect(0, 0, this.app.screen.width, this.app.screen.height);
+    overlay.fill({ color: 0x000000, alpha: 1 });
+    this.addChild(overlay);
+
+    let alpha = 1;
+    const animate = () => {
+      alpha -= 0.02; // Fade out speed
+      overlay.alpha = alpha;
+      if (alpha <= 0) {
+        this.app.ticker.remove(animate);
+        overlay.removeFromParent();
+      }
+    };
+    this.app.ticker.add(animate);
   }
 
   // --- SETUP ---
@@ -87,8 +106,8 @@ export class DiceBossScene extends Container {
     // --- UNITS ---
     this.bossDisplay = new UnitDisplay({
       name: "DICE MASTER",
-      maxHp: 2000, // Higher HP for score based game
-      currentHp: 2000,
+      maxHp: 300, // Higher HP for score based game
+      currentHp: 300,
       maxShield: 0,
       currentShield: 0,
     });

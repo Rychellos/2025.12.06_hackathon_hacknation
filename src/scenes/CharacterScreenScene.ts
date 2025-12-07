@@ -1,4 +1,4 @@
-import { Application, Container } from "pixi.js";
+import { Application, Container, Graphics } from "pixi.js";
 import UserData from "../data/UsersCharacter";
 import { StatDisplay } from "../components/StatDisplay";
 
@@ -13,6 +13,25 @@ export class CharacterScreenScene extends Container {
     this.app.ticker.add(this.update.bind(this));
 
     this.createLabels();
+    this.showTransition();
+  }
+
+  private showTransition(): void {
+    const overlay = new Graphics(); // Need to import Graphics
+    overlay.rect(0, 0, this.app.screen.width, this.app.screen.height);
+    overlay.fill({ color: 0x000000, alpha: 1 });
+    this.addChild(overlay);
+
+    let alpha = 1;
+    const animate = () => {
+      alpha -= 0.02;
+      overlay.alpha = alpha;
+      if (alpha <= 0) {
+        this.app.ticker.remove(animate);
+        overlay.removeFromParent();
+      }
+    };
+    this.app.ticker.add(animate);
   }
 
   private createLabels() {

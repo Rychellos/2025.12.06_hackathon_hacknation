@@ -40,6 +40,25 @@ export class CombatScene extends Container {
     this.createBackground();
     this.createUI();
     this.showSlotMachine();
+    this.showTransition();
+  }
+
+  private showTransition(): void {
+    const overlay = new Graphics();
+    overlay.rect(0, 0, this.app.screen.width, this.app.screen.height);
+    overlay.fill({ color: 0x000000, alpha: 1 });
+    this.addChild(overlay);
+
+    let alpha = 1;
+    const animate = () => {
+      alpha -= 0.02; // Fade out speed
+      overlay.alpha = alpha;
+      if (alpha <= 0) {
+        this.app.ticker.remove(animate);
+        overlay.removeFromParent();
+      }
+    };
+    this.app.ticker.add(animate);
   }
 
   private createBackground(): void {
