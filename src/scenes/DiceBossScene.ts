@@ -6,7 +6,6 @@ import {
   Graphics,
   Sprite,
 } from "pixi.js";
-import { MenuButton } from "../components/MenuButton";
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
 import {
@@ -163,13 +162,13 @@ export class DiceBossScene extends Container {
     });
 
     // Position on the right side of the table
-    const playerX = this.app.screen.width * 0.20;
+    const playerX = this.app.screen.width * 0.2;
     const playerY = this.app.screen.height - 80;
     this.playerDisplay.position.set(playerX, playerY);
     this.addChild(this.playerDisplay);
 
     this.diceContainer = new Container();
-    this.diceContainer.position.set(w * 0.40, h - 140);
+    this.diceContainer.position.set(w * 0.4, h - 140);
     this.addChild(this.diceContainer);
 
     this.actionContainer = new Container();
@@ -221,7 +220,7 @@ export class DiceBossScene extends Container {
       style: selStyle,
     });
     this.selectionScoreText.anchor.set(0.5);
-    this.selectionScoreText.position.set(w * 0.40, h - 110);
+    this.selectionScoreText.position.set(w * 0.4, h - 110);
     this.addChild(this.selectionScoreText);
 
     // Instructions
@@ -792,9 +791,6 @@ export class DiceBossScene extends Container {
 
     this.addChild(slotMachineScene);
 
-    // Initial auto-roll
-    slotMachineScene.performInitialRoll();
-
     const userData = UsersCharacter.getData();
     this.playerDisplay.updateHealth(
       GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
@@ -810,14 +806,19 @@ export class DiceBossScene extends Container {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
   // --- UPDATE LOOP ---
-  private update(_ticker: any): void {
+  private update(): void {
+    if (this.bossDisplay && this.bossDisplay.visualContainer) {
+      const time = Date.now();
+      // Breathing/Squash effect
+      const scaleOffset = Math.sin(time * 0.003) * 0.05;
+      this.bossDisplay.visualContainer.scale.y = 1 + scaleOffset;
+    }
     if (this.bossDisplay && this.bossStartY !== 0) {
       const time = Date.now();
       // Float up and down: Amplitude 10px, Speed factor
       const offset = Math.sin(time * 0.002) * 10;
       // Animate ONLY the visual part, not the whole container (HP bar etc)
       this.bossDisplay.visualContainer.position.y = offset;
-      // Note: visualContainer is at 0,0 locally. We just offset it.
     }
 
     if (this.slotMachineScene) {
@@ -826,6 +827,7 @@ export class DiceBossScene extends Container {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public override destroy(options?: any): void {
     this.app.ticker.remove(this.update, this);
     super.destroy(options);

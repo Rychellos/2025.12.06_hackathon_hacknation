@@ -39,9 +39,6 @@ export class CharacterCreationScene extends Container {
     this.createInstructions();
 
     // Automatically start rolling on load
-    setTimeout(() => {
-      this.slotMachineScene.performInitialRoll();
-    }, 500);
   }
 
   private createBackground(): void {

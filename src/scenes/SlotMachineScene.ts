@@ -20,6 +20,7 @@ export class SlotMachineScene extends Container {
   private rerollsRemaining: number;
   private maxRerolls: number;
   private rerollText!: Text;
+  private instructionText!: Text;
   private nextButton!: ImageButton;
   private onNext?: () => void;
   private onRoll?: () => void;
@@ -65,13 +66,33 @@ export class SlotMachineScene extends Container {
     });
 
     this.rerollText = new Text({
-      text: `Rerolls: ${this.rerollsRemaining}/${this.maxRerolls}`,
+      text: `Przerzuty: ${this.rerollsRemaining}/${this.maxRerolls}`,
       style: rerollStyle,
     });
 
     this.rerollText.anchor.set(0.5, 1); // Anchor at bottom center of text
     this.rerollText.position.set(0, -slotMachineHeight / 2 - 10); // Above the machine
     this.addChild(this.rerollText);
+
+    // Instruction Text
+    const instructionStyle = new TextStyle({
+      fontFamily: "Arial, sans-serif",
+      fontSize: 16,
+      fontWeight: "bold",
+      fill: 0xffffff,
+      stroke: { color: 0x000000, width: 2 },
+      wordWrap: true,
+      wordWrapWidth: 400,
+      align: "center",
+    });
+
+    this.instructionText = new Text({
+      text: "Pociągnij za dźwignię, aby wylosować statystyki",
+      style: instructionStyle,
+    });
+    this.instructionText.anchor.set(0.5, 1);
+    this.instructionText.position.set(0, -slotMachineHeight / 2 - 40); // Above reroll text
+    this.addChild(this.instructionText);
 
     this.createNextButton();
 
@@ -115,18 +136,16 @@ export class SlotMachineScene extends Container {
     }
 
     this.rerollsRemaining--;
-    this.rerollText.text = `Rerolls: ${this.rerollsRemaining}/${this.maxRerolls}`;
+    this.rerollText.text = `Przerzuty: ${this.rerollsRemaining}/${this.maxRerolls}`;
+
+    // Hide instruction text on first roll
+    if (this.instructionText.visible) {
+      this.instructionText.visible = false;
+    }
 
     // Pass target frame: 4 (5th sprite) if no rerolls left, 0 otherwise
     const targetFrame = this.rerollsRemaining === 0 ? 4 : 0;
     this.slotMachine.roll(targetFrame);
-  }
-
-  /**
-   * Perform initial roll (doesn't count against reroll limit)
-   */
-  public performInitialRoll(): void {
-    this.slotMachine.roll();
   }
 
   /**

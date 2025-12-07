@@ -123,7 +123,7 @@ export class SlotMachine extends Container {
     this.backgroundAnimationTimer += deltaTime;
 
     // Update background animation
-    const totalFrames = this.availableFrames.length;
+    const totalFrames = this.availableFrames.length - 1;
     const animationDuration = 120; // Total duration for background cycle
     const framesPerCycle = Math.floor(animationDuration / totalFrames);
 

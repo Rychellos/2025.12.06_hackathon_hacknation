@@ -1,4 +1,13 @@
-import { Container, Graphics, Text, TextStyle, Texture, Sprite, AnimatedSprite, Rectangle } from "pixi.js";
+import {
+  Container,
+  Graphics,
+  Text,
+  TextStyle,
+  Texture,
+  Sprite,
+  AnimatedSprite,
+  Rectangle,
+} from "pixi.js";
 
 export interface UnitDisplayOptions {
   name: string;
@@ -150,7 +159,7 @@ export class UnitDisplay extends Container {
       const rect = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight);
       const frameTex = new Texture({
         source: texture.source,
-        frame: rect
+        frame: rect,
       });
       frames.push(frameTex);
     }
