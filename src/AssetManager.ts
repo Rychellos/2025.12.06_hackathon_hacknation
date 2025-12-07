@@ -171,7 +171,7 @@ export const musicDiceBattle = (await import("./assets/music/dice_battle.mp3"))
 export const musicLobby = (await import("./assets/music/lobby.mp3")).default;
 export const musicMainMenu = (await import("./assets/music/medmain_menu.mp3"))
   .default;
-export const musicQuackDuck = (await import("./assets/music/quack-duck.mp3"))
+export const musicQuackDuck = (await import("./assets/sounds/quack-duck.mp3"))
   .default;
 
 // Sounds

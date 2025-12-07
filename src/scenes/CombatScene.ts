@@ -23,6 +23,7 @@ import {
   duckRock,
   duckPaper,
   duckScissors,
+  musicQuackDuck,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -417,6 +418,7 @@ export class CombatScene extends Container {
     this.resultText.text = "ZWYCIĘSTWO!";
     this.resultText.style.fill = "#ffd700"; // Gold
     GameProgress.markBossAsBeaten(1); // Mark Boss 1 as beaten
+    SoundManager.getInstance().playSfx(musicQuackDuck);
 
     setTimeout(() => {
       this.destroy();
