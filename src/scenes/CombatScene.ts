@@ -63,6 +63,9 @@ export class CombatScene extends Container {
     this.createUI();
     this.showSlotMachine();
     this.showTransition();
+
+    // Start Update Loop
+    this.app.ticker.add(this.update, this);
   }
 
   private showTransition(): void {
@@ -483,5 +486,21 @@ export class CombatScene extends Container {
       GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
       GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
     );
+  }
+
+  // --- UPDATE LOOP ---
+  private update(_ticker: any): void {
+    if (this.bossDisplay && this.bossDisplay.visualContainer) {
+      const time = Date.now();
+      // Breathing/Squash effect: Height changes by a few pixels
+      // Base scale is 1. We oscillate slightly. 
+      const scaleOffset = Math.sin(time * 0.003) * 0.05;
+      this.bossDisplay.visualContainer.scale.y = 1 + scaleOffset;
+    }
+  }
+
+  public override destroy(options?: any): void {
+    this.app.ticker.remove(this.update, this);
+    super.destroy(options);
   }
 }

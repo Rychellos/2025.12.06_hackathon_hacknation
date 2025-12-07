@@ -57,6 +57,8 @@ export class DiceBossScene extends Container {
   private turnAccumulatedScore = 0; // Points in "Pot"
   private isPlayerTurn = true;
   private isAnimating = false;
+  private bossStartY = 0; // For levitation
+  private slotMachineScene?: SlotMachineScene; // Track for cleanup if needed
 
   constructor(app: Application) {
     super();
@@ -124,7 +126,11 @@ export class DiceBossScene extends Container {
       visualScaleX: -3, // Flip horizontally to face left
     });
     this.bossDisplay.position.set(w * 0.75, h * 0.3);
+    this.bossStartY = this.bossDisplay.position.y;
     this.addChild(this.bossDisplay);
+
+    // Start Update Loop
+    this.app.ticker.add(this.update, this);
 
     // --- TABLE & LAYOUT ---
     const table = new Sprite(casino_table_panel);
@@ -786,5 +792,26 @@ export class DiceBossScene extends Container {
 
   private delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  // --- UPDATE LOOP ---
+  private update(_ticker: any): void {
+    if (this.bossDisplay && this.bossStartY !== 0) {
+      const time = Date.now();
+      // Float up and down: Amplitude 10px, Speed factor
+      const offset = Math.sin(time * 0.002) * 10;
+      // Animate ONLY the visual part, not the whole container (HP bar etc)
+      this.bossDisplay.visualContainer.position.y = offset;
+      // Note: visualContainer is at 0,0 locally. We just offset it.
+    }
+
+    if (this.slotMachineScene) {
+      // If we had a ref to slot machine scene update, but it handles its own update via ticker normally.
+      // SlotMachineScene constructor adds itself to ticker.
+    }
+  }
+
+  public override destroy(options?: any): void {
+    this.app.ticker.remove(this.update, this);
+    super.destroy(options);
   }
 }

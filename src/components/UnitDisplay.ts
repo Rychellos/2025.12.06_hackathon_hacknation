@@ -26,7 +26,7 @@ export class UnitDisplay extends Container {
   private shieldText: Text;
   private showVisual: boolean;
 
-  private visualContainer: Container;
+  public visualContainer: Container;
   private visualSprite?: Sprite;
 
   private scaleX: number;
