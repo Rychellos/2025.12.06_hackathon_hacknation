@@ -293,11 +293,7 @@ export class DiceBossScene extends Container {
     this.actionContainer.visible = true;
     this.showMessage("YOUR TURN");
 
-    // Auto-roll start?
-    // Usually KCD requires initial roll action?
-    // Let's make user click Roll (or we can simulate initial roll)
-    // To permit "Roll More" button to serve as "Start Roll", we need to check state.
-    // Simplifying: Auto-roll first throw to speed up flow.
+
     setTimeout(() => this.rollDice(), 1000);
   }
 
@@ -306,10 +302,6 @@ export class DiceBossScene extends Container {
     if (this.isAnimating) return;
     this.isAnimating = true;
 
-    // Identify dice to roll: All !Banked and !Held?
-    // Wait, if we are "rolling more", we must have just banked the Held ones.
-    // So this method is usually called *after* banking logic handles state.
-    // But for Initial Roll, no dice are banked or held.
 
     const toRoll = this.dice.filter((d) => !d.banked && !d.held);
 
@@ -405,25 +397,9 @@ export class DiceBossScene extends Container {
   private actionPass(): void {
     if (!this.isPlayerTurn || this.isAnimating) return;
 
-    // 1. Validate Selection (If any held dice exist)
-    // Player might have banked some, then rolled, then decided to pass?
-    // KCD: You must select scoring dice from the *last* roll to pass.
-    // You can't roll, get 1, 2, 3, 4, 6 (1 is score), ignore it, and pass.
-    // You must select at least one scorer.
-
-    // Logic:
-    // If we just rolled, we have unbanked dice.
-    // We must select at least one scorer from them to add to pot before passing.
-    // OR, if we already have a pot (e.g. from previous sub-turns), can we stop without taking from current roll?
-    // KCD Rule: "If you bust... you lose all". Implies you HAVE to find a scorer.
-    // So if you roll, you MUST select a scorer. If you can't, it's a Bust.
-    // So effectively, you can never Pass empty-handed from a fresh roll.
 
     const selectedDice = this.dice.filter((d) => d.held);
 
-    // Condition: Do we have unbanked dice that are NOT held?
-    // If yes, we are leaving them on the table.
-    // If we have selected dice, we calculate their score.
 
     let finalAddScore = 0;
     if (selectedDice.length > 0) {
@@ -471,7 +447,11 @@ export class DiceBossScene extends Container {
       SlashEffect.playOn(this.bossDisplay, slashTexture);
 
       if (this.bossDisplay.hp <= 0) {
-        this.showMessage("VICTORY!", "#ffd700");
+        this.showMessage("ZWYCIESTWO!", "#ffd700");
+        setTimeout(() => {
+          this.destroy();
+          this.app.stage.addChild(new LevelSelectScene(this.app));
+        }, 2000);
         return;
       }
     }
@@ -481,37 +461,39 @@ export class DiceBossScene extends Container {
 
   // --- BOSS AI --- (Simplified Logic)
   private async bossTurn(): Promise<void> {
-    this.showMessage("BOSS TURN...");
+    this.showMessage("TURA BOSSA...");
     await this.delay(1500);
 
-    // Simple AI: Roll once, take all points, pass.
-    const roll = Array.from(
-      { length: 6 },
-      () => Math.floor(Math.random() * 6) + 1,
+    // Simplied AI: Weighted random damage
+    const rand = Math.random();
+    let damage = 5;
+
+    if (rand < 0.40) damage = 5;
+    else if (rand < 0.70) damage = 10;
+    else if (rand < 0.85) damage = 20;
+    else if (rand < 0.95) damage = 35;
+    else damage = 50;
+
+    this.showMessage(`BOSS ATAKUJE! ${damage} DMG`, "#ef4444");
+
+    // Boss Attack Animation
+    this.bossDisplay.playAnimation(bossAttackTexture);
+
+    const result = CombatUtils.applyDamage(
+      this.playerDisplay.hp,
+      this.playerDisplay.shield,
+      damage,
     );
-    const score = this.calculatePossibleScore(roll as DieValue[]);
+    this.playerDisplay.updateHealth(result.hp);
+    this.playerDisplay.updateShield(result.shield);
 
-    if (score === 0) {
-      this.showMessage("BOSS BUSTED!", "#4ade80");
-    } else {
-      const damage = Math.ceil(score / 10);
-      this.showMessage(`BOSS HITS! ${damage} DMG`, "#ef4444");
-
-      // Boss Attack Animation
-      this.bossDisplay.playAnimation(bossAttackTexture);
-
-      const result = CombatUtils.applyDamage(
-        this.playerDisplay.hp,
-        this.playerDisplay.shield,
-        damage,
-      );
-      this.playerDisplay.updateHealth(result.hp);
-      this.playerDisplay.updateShield(result.shield);
-
-      if (this.playerDisplay.hp <= 0) {
-        this.showMessage("DEFEAT...", "#880000");
-        return;
-      }
+    if (this.playerDisplay.hp <= 0) {
+      this.showMessage("PORAŻKA...", "#880000");
+      setTimeout(() => {
+        this.destroy();
+        this.app.stage.addChild(new LevelSelectScene(this.app));
+      }, 2000);
+      return;
     }
 
     await this.delay(2000);
@@ -537,7 +519,7 @@ export class DiceBossScene extends Container {
     // Calc current selection score
     const selected = this.dice.filter((d) => d.held);
     const selScore = this.calculateStrictScore(selected.map((d) => d.value));
-    this.selectionScoreText.text = `(Selected: ${selScore})`;
+    this.selectionScoreText.text = `(Wybrano: ${selScore})`;
 
     // Visual feedback?
     if (selScore === 0 && selected.length > 0) {
