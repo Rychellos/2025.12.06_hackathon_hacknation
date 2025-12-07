@@ -1,0 +1,1 @@
+const a="/2025.12.06_hackathon_hacknation/assets/Kaczka-BVR5g-zG.mp3";export{a as default};
