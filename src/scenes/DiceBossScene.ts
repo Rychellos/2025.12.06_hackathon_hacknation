@@ -12,6 +12,7 @@ import { SlotMachineScene } from "./SlotMachineScene";
 import { bossbackground, casino_table_panel } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
+import { GlobalConfig } from "../data/GlobalConfig";
 
 type DieValue = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -92,18 +93,6 @@ export class DiceBossScene extends Container {
     this.bossDisplay.position.set(w * 0.75, h * 0.3);
     this.addChild(this.bossDisplay);
 
-    this.playerDisplay = new UnitDisplay({
-      name: "PLAYER",
-      maxHp: 2000,
-      currentHp: 2000,
-      maxShield: 0,
-      currentShield: 0,
-      showVisual: false,
-      nameColor: "#4ade80",
-    });
-    this.playerDisplay.position.set(w * 0.75, h - 80);
-    this.addChild(this.playerDisplay);
-
     // --- TABLE & LAYOUT ---
     const table = new Sprite(casino_table_panel);
     table.anchor.set(0.5, 1);
@@ -119,6 +108,18 @@ export class DiceBossScene extends Container {
     this.actionContainer = new Container();
     this.actionContainer.position.set(w * 0.35, h - 80);
     this.addChild(this.actionContainer);
+
+    this.playerDisplay = new UnitDisplay({
+      name: "PLAYER",
+      maxHp: GlobalConfig.SCALING_MULTIPLIER * 200, // Assuming base 200 for DiceBoss
+      currentHp: GlobalConfig.SCALING_MULTIPLIER * 200,
+      maxShield: 0,
+      currentShield: 0,
+      showVisual: false,
+      nameColor: "#4ade80",
+    });
+    this.playerDisplay.position.set(w * 0.75, h - 80);
+    this.addChild(this.playerDisplay);
 
     // Buttons
     const rollBtn = new MenuButton({
@@ -273,7 +274,7 @@ export class DiceBossScene extends Container {
     const startTime = Date.now();
 
     while (Date.now() - startTime < duration) {
-      toRoll.forEach(d => {
+      toRoll.forEach((d) => {
         d.value = (Math.floor(Math.random() * 6) + 1) as DieValue;
       });
       this.renderDice();

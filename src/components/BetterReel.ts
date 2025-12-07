@@ -69,45 +69,36 @@ export class BetterReel extends Container {
     }
   }
 
-  public spin(targetIndex?: number): void {
+  public spin(targetValue?: number): void {
     if (this.tween && this.tween.active) return;
 
     const extraSpins = 5 + Math.floor(Math.random() * 3); // Spin at least 5 times full circle
-    const totalSymbols = this.values.length;
+    const totalValues = this.values.length;
 
     // Current "index" roughly
-    const currentIdx = Math.floor(this.reelPosition);
+    const currentPos = Math.floor(this.reelPosition);
+
+    // Calculate desired position to land targetValue in the middle (Slot 1)
+    // Formula: (1 - targetPos) % totalValues == targetIndex
+    // => targetPos == 1 - targetIndex
+    let desiredRemainder = 0;
+    if (targetValue !== undefined) {
+      const targetIndex = this.values.indexOf(targetValue);
+      if (targetIndex !== -1) {
+        desiredRemainder = (1 - targetIndex) % totalValues;
+        if (desiredRemainder < 0) desiredRemainder += totalValues;
+      }
+    } else {
+      desiredRemainder = Math.floor(Math.random() * totalValues);
+    }
 
     // Calculate target position
-    // We want to land such that (targetPos % totalSymbols) corresponds to targetIndex.
-    // But wait, the display logic is:
-    // s.y = ((this.reelPosition + j) % totalSymbols) * symbolSize - symbolSize;
-    // We want the symbol at `targetIndex` to be at a specific y (e.g. middle).
-    // Let's say we want it at j=1 (middle of 3 visible).
-    // ((targetPos + 1) % totalSymbols) == targetIndex.
-    // targetPos + 1 = k * totalSymbols + targetIndex
-    // targetPos = k * totalSymbols + targetIndex - 1.
+    // We want targetPos % totalValues == desiredRemainder
+    const currentRemainder = currentPos % totalValues;
+    let diff = desiredRemainder - currentRemainder;
+    if (diff < 0) diff += totalValues;
 
-    // Let's find the next multiple of totalSymbols that is far enough away.
-    let targetPos = currentIdx + extraSpins * totalSymbols;
-
-    if (targetIndex !== undefined) {
-      // Align to targetIndex
-      // We want targetPos % totalSymbols == targetIndex - 1 (to center it at j=1)
-      // Note: targetIndex is 0-based index of the value in `values`.
-
-      // Current targetPos might not be aligned.
-      // Let's adjust it.
-      const desiredRemainder = (targetIndex - 1 + totalSymbols) % totalSymbols;
-      const currentRemainder = targetPos % totalSymbols;
-
-      let diff = desiredRemainder - currentRemainder;
-      if (diff < 0) diff += totalSymbols;
-
-      targetPos += diff;
-    } else {
-      targetPos += Math.floor(Math.random() * totalSymbols);
-    }
+    const targetPos = currentPos + diff + extraSpins * totalValues;
 
     const time = 2000 + Math.random() * 500;
 
@@ -136,23 +127,8 @@ export class BetterReel extends Container {
       if (phase === 1) {
         this.tween.active = false;
       }
-    } else {
-      // Use deltaTime to avoid unused var error if no tween (or just ignore it)
-      // Actually, we don't need deltaTime for the tween logic as it uses Date.now()
-      // But we might want to use it for something else later.
-      // For now, let's just log it or ignore it properly.
-      // Or better, just remove the parameter if not needed, but update signature usually requires it.
-      // Let's just use it in a dummy way or disable the rule for the line.
-      // Or better:
-      // this.velocity += deltaTime * 0;
     }
 
-    // Use deltaTime for something or remove it?
-    // The snippet uses app.ticker.add(() => ...) which doesn't use delta.
-    // But our update method signature has it.
-    // Let's just suppress the lint error for now or remove the arg if possible.
-    // But SlotMachine calls it with delta.
-    // Let's just use `void deltaTime;`
     void deltaTime;
 
     // Update Blur
@@ -162,17 +138,11 @@ export class BetterReel extends Container {
     // Update Symbols
     const symbolSize = this.symbolHeight;
     const totalSymbols = this.symbols.length;
+    const totalValues = this.values.length;
 
     for (let j = 0; j < totalSymbols; j++) {
       const s = this.symbols[j];
       const prevy = s.y;
-
-      // Position formula from snippet
-      // s.y = ((r.position + j) % r.symbols.length) * SYMBOL_SIZE - SYMBOL_SIZE;
-      // Note: snippet has `r.position` increasing.
-      // (pos + j) % count -> 0..count-1
-      // times size -> 0..totalHeight
-      // minus size -> shift up one slot (so one is above view)
 
       s.y =
         ((this.reelPosition + j) % totalSymbols) * symbolSize - symbolSize + 24;
@@ -180,11 +150,14 @@ export class BetterReel extends Container {
       // Detect wrapping
       if (s.y < 0 && prevy > symbolSize) {
         // Symbol wrapped around to top
-        // Here we can swap the value!
-        // Pick a random value from our list
-        const randomVal =
-          this.values[Math.floor(Math.random() * this.values.length)];
-        s.text = randomVal.toString();
+        // Set text deterministically based on reel position
+        // The symbol entering at Top (Slot 0) should have value:
+        // index = ( -floor(pos) ) % totalValues
+        const currentPos = Math.floor(this.reelPosition);
+        let valIndex = -currentPos % totalValues;
+        if (valIndex < 0) valIndex += totalValues;
+
+        s.text = this.values[valIndex].toString();
       }
     }
   }

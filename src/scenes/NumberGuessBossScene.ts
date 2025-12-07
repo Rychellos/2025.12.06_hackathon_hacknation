@@ -13,6 +13,7 @@ import { SlotMachineScene } from "./SlotMachineScene";
 import { bossbackground, casino_table_panel } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
+import { GlobalConfig } from "../data/GlobalConfig";
 
 export class NumberGuessBossScene extends Container {
   private app: Application;
@@ -78,10 +79,10 @@ export class NumberGuessBossScene extends Container {
     // --- PLAYER AREA (Bottom Right of Table) ---
     this.playerDisplay = new UnitDisplay({
       name: "PLAYER",
-      maxHp: 100,
-      currentHp: 100,
-      maxShield: 20,
-      currentShield: 20,
+      maxHp: GlobalConfig.SCALING_MULTIPLIER * 10, // Assuming base 10 for NumberGuess
+      currentHp: GlobalConfig.SCALING_MULTIPLIER * 10,
+      maxShield: GlobalConfig.SCALING_MULTIPLIER * 2,
+      currentShield: GlobalConfig.SCALING_MULTIPLIER * 2,
       showVisual: false,
       nameColor: "#4ade80",
     });

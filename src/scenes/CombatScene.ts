@@ -9,15 +9,20 @@ import {
 import { MenuButton } from "../components/MenuButton";
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
-import { bossBackground, casino_table_panel, paper, rock, scissors } from "../AssetManager";
+import {
+  bossBackground,
+  casino_table_panel,
+  paper,
+  rock,
+  scissors,
+} from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
 import { ImageButton } from "../components/ImageButton";
 import UsersCharacter from "../data/UsersCharacter";
+import { GlobalConfig } from "../data/GlobalConfig";
 
 type Choice = "rock" | "paper" | "scissors";
-
-const MULTIPLIER = 10;
 
 export class CombatScene extends Container {
   private app: Application;
@@ -84,10 +89,18 @@ export class CombatScene extends Container {
     // --- PLAYER AREA (Bottom Right of Table) ---
     this.playerDisplay = new UnitDisplay({
       name: UsersCharacter.getData().name || "Gracz",
-      maxHp: MULTIPLIER * UsersCharacter.getData().stats.hitPoints.value,
-      currentHp: MULTIPLIER * UsersCharacter.getData().stats.hitPoints.value,
-      maxShield: MULTIPLIER * UsersCharacter.getData().stats.defense.value,
-      currentShield: MULTIPLIER * UsersCharacter.getData().stats.defense.value,
+      maxHp:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.hitPoints.value,
+      currentHp:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.hitPoints.value,
+      maxShield:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.defense.value,
+      currentShield:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.defense.value,
       showVisual: false,
       nameColor: "#4ade80",
     });
@@ -215,7 +228,12 @@ export class CombatScene extends Container {
 
     this.choiceText.text = `Wybrałeś ${playerChoice.toUpperCase()}! Przeciwnik wybrał ${computerChoice.toUpperCase()}!`;
 
-    let dmg = 10 - Math.min(Math.floor(Math.random() * 5), UsersCharacter.getData().stats.defense.value);
+    let dmg =
+      10 -
+      Math.min(
+        Math.floor(Math.random() * 5),
+        UsersCharacter.getData().stats.defense.value,
+      );
 
     if (playerChoice === computerChoice) {
       this.resultText.text = "REMIS!";
@@ -236,12 +254,17 @@ export class CombatScene extends Container {
       this.resultText.style.fill = "#ef4444"; // Red
 
       dmg -= UsersCharacter.getData().stats.defense.value * 0.5;
-      UsersCharacter.setDefense(UsersCharacter.getData().stats.defense.value - Math.min(dmg, UsersCharacter.getData().stats.defense.value * 0.5));
+      UsersCharacter.setDefense(
+        UsersCharacter.getData().stats.defense.value -
+          Math.min(dmg, UsersCharacter.getData().stats.defense.value * 0.5),
+      );
 
       // Deal damage to PLAYER
       const currentHp = this.playerDisplay.hp - dmg;
       this.playerDisplay.updateHealth(Math.max(0, currentHp));
-      this.playerDisplay.updateShield(UsersCharacter.getData().stats.defense.value);
+      this.playerDisplay.updateShield(
+        UsersCharacter.getData().stats.defense.value,
+      );
     }
 
     // Clear result text after delay
@@ -267,9 +290,15 @@ export class CombatScene extends Container {
       },
       onRoll: () => {
         const userData = UsersCharacter.getData();
-        this.playerDisplay.updateHealth(MULTIPLIER * userData.stats.hitPoints.value, MULTIPLIER * userData.stats.hitPoints.value);
-        this.playerDisplay.updateShield(MULTIPLIER * userData.stats.defense.value, MULTIPLIER * userData.stats.defense.value);
-      }
+        this.playerDisplay.updateHealth(
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+        );
+        this.playerDisplay.updateShield(
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+        );
+      },
     });
 
     // Center the slot machine scene
@@ -284,7 +313,13 @@ export class CombatScene extends Container {
     slotMachineScene.performInitialRoll();
 
     const userData = UsersCharacter.getData();
-    this.playerDisplay.updateHealth(MULTIPLIER * userData.stats.hitPoints.value, MULTIPLIER * userData.stats.hitPoints.value);
-    this.playerDisplay.updateShield(MULTIPLIER * userData.stats.defense.value, MULTIPLIER * userData.stats.defense.value);
+    this.playerDisplay.updateHealth(
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+    );
+    this.playerDisplay.updateShield(
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+    );
   }
 }

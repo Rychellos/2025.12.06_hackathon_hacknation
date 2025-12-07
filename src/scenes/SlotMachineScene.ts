@@ -37,13 +37,15 @@ export class SlotMachineScene extends Container {
     this.slotMachine = new SlotMachine({
       onRollComplete: (value) => {
         console.log(`Slot machine rolled: ${value}`);
-        this.onRoll && this.onRoll();
+        if (this.onRoll) {
+          this.onRoll();
+        }
       },
       onClick: () => this.rollStats(),
     });
 
-    this.scale = 2
-    this.position.set(this.app.screen.width / 2, - 500)
+    this.scale = 2;
+    this.position.set(this.app.screen.width / 2, -500);
 
     const slotMachineWidth = this.slotMachine.width;
     this.slotMachine.position.set(-slotMachineWidth / 2, 0); // Position relative to container center
