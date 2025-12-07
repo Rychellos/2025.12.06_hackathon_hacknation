@@ -156,3 +156,26 @@ export const lotekBossTexture: Texture = await Assets.load(
 export const duckScissors: Texture = await Assets.load(
   (await import("./assets/sheets/duck-scissors.png")).default,
 );
+
+// --- AUDIO ASSETS ---
+// Music
+export const musicEnterBattle = (
+  await import("./assets/music/Enter_battle.mp3")
+).default;
+export const musicKaczka = (await import("./assets/music/Kaczka.mp3")).default;
+export const musicPoKrulefsku = (
+  await import("./assets/music/Po_krulefsku.mp3")
+).default;
+export const musicDiceBattle = (await import("./assets/music/dice_battle.mp3"))
+  .default;
+export const musicLobby = (await import("./assets/music/lobby.mp3")).default;
+export const musicMainMenu = (await import("./assets/music/medmain_menu.mp3"))
+  .default;
+export const musicQuackDuck = (await import("./assets/music/quack-duck.mp3"))
+  .default;
+
+// Sounds
+export const sfxDice = (await import("./assets/sounds/dice-sound.m4a")).default;
+export const sfxSlash = (await import("./assets/sounds/slash-sound.m4a"))
+  .default;
+export const sfxSlot = (await import("./assets/sounds/slot-sound.m4a")).default;

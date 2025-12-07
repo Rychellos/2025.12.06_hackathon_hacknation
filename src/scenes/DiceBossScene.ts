@@ -24,7 +24,13 @@ import { CombatUtils } from "../utils/CombatUtils";
 import UsersCharacter from "../data/UsersCharacter";
 import { ImageButton } from "../components/ImageButton";
 import { SlashEffect } from "../components/SlashEffect";
-import { slashTexture } from "../AssetManager";
+import {
+  slashTexture,
+  musicDiceBattle,
+  sfxDice,
+  sfxSlash,
+} from "../AssetManager";
+import { SoundManager } from "../utils/SoundManager";
 
 type DieValue = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -132,6 +138,9 @@ export class DiceBossScene extends Container {
 
     // Start Update Loop
     this.app.ticker.add(this.update, this);
+
+    // Play Music
+    SoundManager.getInstance().playMusic(musicDiceBattle);
 
     // --- CASINO TABLE (Bottom) ---
     const table = new Sprite(casino_table_panel);
@@ -319,6 +328,8 @@ export class DiceBossScene extends Container {
     const duration = 600;
     const startTime = Date.now();
 
+    SoundManager.getInstance().playSfx(sfxDice);
+
     while (Date.now() - startTime < duration) {
       toRoll.forEach((d) => {
         d.value = (Math.floor(Math.random() * 6) + 1) as DieValue;
@@ -442,9 +453,8 @@ export class DiceBossScene extends Container {
       this.bossDisplay.updateShield(result.shield);
 
       // Slash Animation
-      // Play slash animation
       SlashEffect.playOn(this.bossDisplay, slashTexture);
-
+      SoundManager.getInstance().playSfx(sfxSlash);
       if (this.bossDisplay.hp <= 0) {
         this.showMessage("ZWYCIESTWO!", "#ffd700");
         setTimeout(() => {

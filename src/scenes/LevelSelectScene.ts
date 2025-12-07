@@ -5,7 +5,8 @@ import { CombatScene } from "./CombatScene";
 import { NumberGuessBossScene } from "./NumberGuessBossScene";
 import { DiceBossScene } from "./DiceBossScene";
 import { Background } from "../components/Background";
-import { backButton, levelSelectBackground } from "../AssetManager";
+import { backButton, levelSelectBackground, musicLobby } from "../AssetManager";
+import { SoundManager } from "../utils/SoundManager";
 import { ImageButton } from "../components/ImageButton";
 
 export class LevelSelectScene extends Container {
@@ -21,6 +22,9 @@ export class LevelSelectScene extends Container {
     this.createBackground();
 
     this.createNodes();
+
+    // Play Music
+    SoundManager.getInstance().playMusic(musicLobby);
     this.createUI();
   }
 

@@ -61,21 +61,20 @@ export class IntroScene extends Container {
       if (this.videoSource) {
         this.videoSource.currentTime = 0;
         this.videoSource.muted = false; // Enable sound
-        // In Pixi v8, the texture source handles the video element
-        // We might need to ensure it plays if not auto-playing
-        this.videoSource.play().catch((e) => {
-          console.error("Video play failed", e);
-          // If play fails (e.g. no interaction), we might need to skip
-          this.transitionToNextScene();
-        });
+        this.videoSource.loop = false;
 
         // Listen for end
         this.videoSource.onended = () => {
           this.transitionToNextScene();
         };
 
-        // Also just in case, ensure loop is false
-        this.videoSource.loop = false;
+        const playPromise = this.videoSource.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((e) => {
+            console.warn("Video autoplay failed, waiting for interaction", e);
+            // If autoplay fails, we wait for the user to click (setupInput handles this)
+          });
+        }
       }
     } catch (e) {
       console.error("Failed to load video", e);
@@ -92,18 +91,26 @@ export class IntroScene extends Container {
     overlay.cursor = "pointer";
     this.addChild(overlay);
 
-    // Skip on click
-    overlay.on("pointerdown", () => {
-      this.transitionToNextScene();
-    });
+    const handleInteraction = () => {
+      if (
+        this.videoSource &&
+        this.videoSource.paused &&
+        !this.videoSource.ended
+      ) {
+        // Try to play if paused (and not ended)
+        this.videoSource.play().catch(() => this.transitionToNextScene());
+      } else {
+        // Skip if playing or ended
+        this.transitionToNextScene();
+      }
+    };
 
-    // Also skip on key press
-    window.addEventListener("keydown", this.onKeyDown);
+    // Skip/Play on click
+    overlay.on("pointerdown", handleInteraction);
+
+    // Also skip/play on key press
+    window.addEventListener("keydown", () => handleInteraction());
   }
-
-  private onKeyDown = (): void => {
-    this.transitionToNextScene();
-  };
 
   private transitionToNextScene(): void {
     if (this.isTransitioning) return;
@@ -116,7 +123,7 @@ export class IntroScene extends Container {
     }
 
     // Remove listener
-    window.removeEventListener("keydown", this.onKeyDown);
+    // window.removeEventListener("keydown", this.onKeyDown); // Removed as we use anonymous function now
 
     // Remove from stage before destroying
     this.app.stage.removeChild(this);

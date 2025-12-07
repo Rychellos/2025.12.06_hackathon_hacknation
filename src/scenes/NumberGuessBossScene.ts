@@ -19,6 +19,7 @@ import {
   fleeButton,
   lotekBossTexture,
   lottoTexture,
+  musicPoKrulefsku,
   slashTexture,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
@@ -27,6 +28,7 @@ import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
 import UsersCharacter from "../data/UsersCharacter";
 import { SlashEffect } from "../components/SlashEffect";
+import { SoundManager } from "../utils/SoundManager";
 
 export class NumberGuessBossScene extends Container {
   private app: Application;
@@ -47,6 +49,9 @@ export class NumberGuessBossScene extends Container {
 
     // Start Update Loop
     this.app.ticker.add(this.update, this);
+
+    // Play Music
+    SoundManager.getInstance().playMusic(musicPoKrulefsku);
   }
 
   private showTransition(): void {

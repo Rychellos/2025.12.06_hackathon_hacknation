@@ -18,7 +18,9 @@ import {
   rankingButton,
   settingsButton,
   logo,
+  musicMainMenu,
 } from "../AssetManager";
+import { SoundManager } from "../utils/SoundManager";
 import UsersCharacter from "../data/UsersCharacter";
 
 /**
@@ -55,6 +57,20 @@ export class MainMenuScene extends Container {
     // Listen for resize events
     // Listen for resize events via renderer to ensure screen props are updated
     this.app.renderer.on("resize", this.onResize);
+
+    // Setup interaction for music autoplay
+    this.setupMusicAutoplay();
+  }
+
+  private setupMusicAutoplay(): void {
+    const startMusic = () => {
+      SoundManager.getInstance().playMusic(musicMainMenu);
+      window.removeEventListener("pointerdown", startMusic);
+      window.removeEventListener("keydown", startMusic);
+    };
+
+    window.addEventListener("pointerdown", startMusic);
+    window.addEventListener("keydown", startMusic);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
