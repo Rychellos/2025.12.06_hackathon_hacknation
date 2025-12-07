@@ -132,33 +132,47 @@ export class DiceBossScene extends Container {
     // Start Update Loop
     this.app.ticker.add(this.update, this);
 
-    // --- TABLE & LAYOUT ---
+    // --- CASINO TABLE (Bottom) ---
     const table = new Sprite(casino_table_panel);
-    table.anchor.set(0.5, 1);
-    table.width = 1020;
-    table.height = 300;
-    table.position.set(w / 2, h);
+    table.anchor.set(0.5, 1); // Anchor bottom center
+    table.width = 256 * 8;
+    table.height = 64 * 8; // Adjust height to fit controls
+    table.texture.source.scaleMode = "nearest";
+    table.position.set(this.app.screen.width / 2, this.app.screen.height);
     this.addChild(table);
 
-    this.diceContainer = new Container();
-    this.diceContainer.position.set(w * 0.35, h - 200);
-    this.addChild(this.diceContainer);
-
-    this.actionContainer = new Container();
-    this.actionContainer.position.set(w * 0.35, h - 80);
-    this.addChild(this.actionContainer);
-
+    // --- PLAYER AREA (Bottom Right of Table) ---
     this.playerDisplay = new UnitDisplay({
-      name: "PLAYER",
-      maxHp: GlobalConfig.SCALING_MULTIPLIER * 200, // Assuming base 200 for DiceBoss
-      currentHp: GlobalConfig.SCALING_MULTIPLIER * 200,
-      maxShield: 0,
-      currentShield: 0,
+      name: UsersCharacter.getData().name || "Gracz",
+      maxHp:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.hitPoints.value,
+      currentHp:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.hitPoints.value,
+      maxShield:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.defense.value,
+      currentShield:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.defense.value,
       showVisual: false,
       nameColor: "#4ade80",
     });
-    this.playerDisplay.position.set(w * 0.75, h - 80);
+
+    // Position on the right side of the table
+    const playerX = this.app.screen.width * 0.20;
+    const playerY = this.app.screen.height - 80;
+    this.playerDisplay.position.set(playerX, playerY);
     this.addChild(this.playerDisplay);
+
+    this.diceContainer = new Container();
+    this.diceContainer.position.set(w * 0.40, h - 140);
+    this.addChild(this.diceContainer);
+
+    this.actionContainer = new Container();
+    this.actionContainer.position.set(w * 0.75, h - 80);
+    this.addChild(this.actionContainer);
 
     // Buttons
     const rollBtn = new MenuButton({
@@ -190,7 +204,7 @@ export class DiceBossScene extends Container {
     });
     this.turnScoreText = new Text({ text: "Pot: 0", style: potStyle });
     this.turnScoreText.anchor.set(0.5);
-    this.turnScoreText.position.set(w * 0.35, h - 280);
+    this.turnScoreText.position.set(w * 0.6, h - 50);
     this.addChild(this.turnScoreText);
 
     // Selection Score (Current Selection)
@@ -205,7 +219,7 @@ export class DiceBossScene extends Container {
       style: selStyle,
     });
     this.selectionScoreText.anchor.set(0.5);
-    this.selectionScoreText.position.set(w * 0.35, h - 250);
+    this.selectionScoreText.position.set(w * 0.40, h - 110);
     this.addChild(this.selectionScoreText);
 
     // Instructions
@@ -217,11 +231,11 @@ export class DiceBossScene extends Container {
       fontStyle: "italic",
     });
     this.instructionsText = new Text({
-      text: "Select dice to Score. Roll More risks Busting. Pass to Bank.",
+      text: "Wybierz kości do punktacji. Rzuć więcej, ryzykując przegraną. Przekaż do banku.",
       style: instrStyle,
     });
     this.instructionsText.anchor.set(0.5);
-    this.instructionsText.position.set(w * 0.35, h - 310);
+    this.instructionsText.position.set(w * 0.6, h - 130);
     this.addChild(this.instructionsText);
 
     // Message Overlay
