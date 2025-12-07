@@ -12,6 +12,7 @@ import { SlotMachineScene } from "./SlotMachineScene";
 import {
   bossBackground,
   casino_table_panel,
+  fleeButton,
   paper,
   rock,
   scissors,
@@ -229,16 +230,16 @@ export class CombatScene extends Container {
     this.addChild(this.choiceText);
 
     // Back Button
-    const backBtn = new MenuButton({
-      label: "Ucieknij",
-      width: 128,
-      height: 48,
+    const backBtn = new ImageButton({
+      texture: fleeButton,
+      width: 256,
+      height: 64,
       onClick: () => {
         this.destroy();
         this.app.stage.addChild(new LevelSelectScene(this.app));
       },
     });
-    backBtn.position.set(20, 20);
+    backBtn.position.set(148, 48);
     this.addChild(backBtn);
   }
 

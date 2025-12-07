@@ -48,6 +48,10 @@ const slotySheetTexture: Texture = await Assets.load(
   (await import("./assets/sloty-Sheet.png")).default,
 );
 
+export const fleeButton: Texture = await Assets.load(
+  (await import("./assets/flee.png")).default,
+);
+
 // Create spritesheet with 64x64px frames
 const slotySheetData = {
   frames: {} as Record<
