@@ -152,14 +152,14 @@ export class MainMenuScene extends Container {
     const startY = this.app.screen.height / 2 + 50;
     const spacing = 80;
 
-    this.playButton.position.set(centerX - this.playButton.width / 2, startY);
+    this.playButton.position.set(centerX, startY + this.playButton.height / 2);
     this.settingsButton.position.set(
-      centerX - this.settingsButton.width / 2,
-      startY + spacing,
+      centerX,
+      startY + spacing + this.settingsButton.height / 2,
     );
     this.rankingButton.position.set(
-      centerX - this.rankingButton.width / 2,
-      startY + spacing * 2,
+      centerX,
+      startY + spacing * 2 + this.rankingButton.height / 2,
     );
   }
 

@@ -7,7 +7,9 @@ export interface ImageButtonOptions {
   height?: number;
   onClick?: () => void;
   hoverTexture?: Texture;
+  activeTexture?: Texture;
   scale?: number;
+  hoverScale?: boolean
 }
 
 /**
@@ -18,9 +20,9 @@ export class ImageButton extends Container {
   private labelText?: Text;
   private hovered = false;
   private options: Required<
-    Omit<ImageButtonOptions, "label" | "hoverTexture">
+    Omit<ImageButtonOptions, "label" | "hoverTexture" | "activeTexture">
   > &
-    Pick<ImageButtonOptions, "label" | "hoverTexture">;
+    Pick<ImageButtonOptions, "label" | "hoverTexture" | "activeTexture">;
 
   constructor(options: ImageButtonOptions) {
     super();
@@ -28,15 +30,19 @@ export class ImageButton extends Container {
     this.options = {
       width: options.texture.width,
       height: options.texture.height,
-      onClick: () => {},
+      onClick: () => { },
       scale: 1,
       ...options,
+      hoverScale: options.hoverScale !== undefined ? options.hoverScale : true,
     };
 
     // Create background sprite
     this.background = new Sprite(options.texture);
+    this.background.texture.source.scaleMode = "nearest"; // Disable smoothing
+    this.background.anchor.set(0.5); // Center anchor
     this.background.width = this.options.width;
     this.background.height = this.options.height;
+    this.background.position.set(0, 0); // Centered in container
     this.addChild(this.background);
 
     // Create label if provided
@@ -54,10 +60,7 @@ export class ImageButton extends Container {
         style: labelStyle,
       });
       this.labelText.anchor.set(0.5);
-      this.labelText.position.set(
-        this.options.width / 2,
-        this.options.height / 2,
-      );
+      this.labelText.position.set(0, 0); // Centered
       this.addChild(this.labelText);
     }
 
@@ -83,7 +86,9 @@ export class ImageButton extends Container {
     }
 
     // Scale up slightly
-    this.scale.set(this.options.scale * 1.05);
+    if (this.options.hoverScale) {
+      this.scale.set(this.options.scale * 1.05);
+    }
   }
 
   private onPointerOut(): void {
@@ -100,10 +105,23 @@ export class ImageButton extends Container {
     // Scale down for click feedback
     this.scale.set(this.options.scale * 0.95);
 
+    // Switch to active texture if available
+    if (this.options.activeTexture) {
+      this.background.texture = this.options.activeTexture;
+    }
+
     setTimeout(() => {
       this.scale.set(
         this.hovered ? this.options.scale * 1.05 : this.options.scale,
       );
+
+      // Revert texture
+      if (this.options.activeTexture) {
+        this.background.texture = this.hovered
+          ? this.options.hoverTexture || this.options.texture
+          : this.options.texture;
+      }
+
       this.options.onClick();
     }, 100);
   }
@@ -141,7 +159,7 @@ export class ImageButton extends Container {
     this.background.height = height;
 
     if (this.labelText) {
-      this.labelText.position.set(width / 2, height / 2);
+      this.labelText.position.set(0, 0);
     }
   }
 }

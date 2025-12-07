@@ -93,9 +93,14 @@ export const slotySheet = new Spritesheet(slotySheetTexture, slotySheetData);
 await slotySheet.parse();
 
 // Slot machine and reroll button textures
-export const reroll_button: Texture = await Assets.load(
-  "/assets/reroll_button.png",
+export const reroll_button_off: Texture = await Assets.load(
+  (await import("./assets/button_off.png")).default,
 );
+
+export const reroll_button_on: Texture = await Assets.load(
+  (await import("./assets/button_on.png")).default,
+);
+
 export const reroll_button_hover: Texture = await Assets.load(
   "/assets/reroll_button_hover.png",
 );
