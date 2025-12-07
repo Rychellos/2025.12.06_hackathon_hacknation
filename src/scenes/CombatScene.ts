@@ -36,6 +36,12 @@ import { GameProgress } from "../data/GameProgress";
 
 type Choice = "rock" | "paper" | "scissors";
 
+const polishNames = {
+  rock: "Kamień",
+  paper: "Papier",
+  scissors: "Nożyce",
+} as const;
+
 export class CombatScene extends Container {
   private app: Application;
   private bossDisplay!: UnitDisplay;
@@ -104,6 +110,7 @@ export class CombatScene extends Container {
     frameHeight: number,
     animationSpeed: number = 0.1,
   ): AnimatedSprite {
+    texture.source.scaleMode = "nearest";
     const frames: Texture[] = [];
     const cols = Math.floor(texture.width / frameWidth);
     const rows = Math.floor(texture.height / frameHeight);
@@ -134,14 +141,14 @@ export class CombatScene extends Container {
   private createUI(): void {
     // --- BOSS ANIMATIONS ---
     // Duck sprites are 72x64px
-    this.bossIdleAnim = this.createAnimatedSprite(duckIdle, 72, 64, 0.1);
-    this.bossRockAnim = this.createAnimatedSprite(duckRock, 72, 64, 0.1);
-    this.bossPaperAnim = this.createAnimatedSprite(duckPaper, 72, 64, 0.1);
+    this.bossIdleAnim = this.createAnimatedSprite(duckIdle, 72, 64, 0.2);
+    this.bossRockAnim = this.createAnimatedSprite(duckRock, 72, 64, 0.2);
+    this.bossPaperAnim = this.createAnimatedSprite(duckPaper, 72, 64, 0.2);
     this.bossScissorsAnim = this.createAnimatedSprite(
       duckScissors,
       72,
       64,
-      0.1,
+      0.2,
     );
 
     // --- BOSS AREA (Top Right) ---
@@ -313,11 +320,6 @@ export class CombatScene extends Container {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
-    // Re-enable input after a delay (e.g., 1 second)
-    setTimeout(() => {
-      this.isProcessing = false;
-    }, 1000);
-
     const choices: Choice[] = ["rock", "paper", "scissors"];
     const computerChoice = choices[Math.floor(Math.random() * choices.length)];
 
@@ -331,78 +333,87 @@ export class CombatScene extends Container {
       anim = this.bossScissorsAnim;
     }
 
+    anim.loop = false;
+    anim.onComplete = () => {
+      if (this.destroyed) return;
+
+      // Logic after animation finishes
+      this.choiceText.text = `Wybrałeś ${polishNames[playerChoice]}! Przeciwnik wybrał ${polishNames[computerChoice]}!`;
+
+      if (playerChoice === computerChoice) {
+        this.resultText.text = "Remis!";
+        this.resultText.style.fill = "#ffffff";
+      } else if (
+        (playerChoice === "rock" && computerChoice === "scissors") ||
+        (playerChoice === "paper" && computerChoice === "rock") ||
+        (playerChoice === "scissors" && computerChoice === "paper")
+      ) {
+        this.resultText.text = "Dobrze!";
+        this.resultText.style.fill = "#4ade80"; // Green
+
+        // Player Attacks Boss
+        const playerStats = UsersCharacter.getData().stats;
+        const damage = CombatUtils.rollAttackDamage(
+          playerStats.attack.value,
+          GlobalConfig.SCALING_MULTIPLIER,
+        );
+
+        // Boss has no shield currently, just HP
+        const result = CombatUtils.applyDamage(
+          this.bossDisplay.hp,
+          this.bossDisplay.shield,
+          damage,
+        );
+        this.bossDisplay.updateHealth(result.hp);
+        this.bossDisplay.updateShield(result.shield);
+
+        // Slash Animation
+        SlashEffect.playOn(this.bossDisplay, slashTexture);
+        if (this.bossDisplay.hp <= 0) {
+          this.handleWin();
+          return;
+        }
+      } else {
+        this.resultText.text = "Kiepsko!";
+        this.resultText.style.fill = "#ef4444"; // Red
+
+        // Boss Attacks Player
+        const bossBaseDamage = 5;
+        const damage = CombatUtils.rollAttackDamage(
+          bossBaseDamage,
+          GlobalConfig.SCALING_MULTIPLIER,
+        );
+
+        const result = CombatUtils.applyDamage(
+          this.playerDisplay.hp,
+          this.playerDisplay.shield,
+          damage,
+        );
+
+        this.playerDisplay.updateHealth(result.hp);
+        this.playerDisplay.updateShield(result.shield);
+
+        // Slash Animation
+        SlashEffect.playOn(this.playerDisplay, slashTexture); // Assuming player also gets a slash effect when hit
+        if (this.playerDisplay.hp <= 0) {
+          this.handleLoss();
+          return;
+        }
+      }
+
+      // Reset after delay
+      setTimeout(() => {
+        if (!this.destroyed) {
+          this.isProcessing = false;
+          this.resultText.text = "";
+          this.bossIdleAnim.gotoAndPlay(0);
+          this.bossDisplay.setVisual(this.bossIdleAnim);
+        }
+      }, 1500);
+    };
+
     anim.gotoAndPlay(0);
     this.bossDisplay.setVisual(anim);
-
-    this.choiceText.text = `Wybrałeś ${playerChoice.toUpperCase()}! Przeciwnik wybrał ${computerChoice.toUpperCase()}!`;
-
-    if (playerChoice === computerChoice) {
-      this.resultText.text = "Remis!";
-      this.resultText.style.fill = "#ffffff";
-    } else if (
-      (playerChoice === "rock" && computerChoice === "scissors") ||
-      (playerChoice === "paper" && computerChoice === "rock") ||
-      (playerChoice === "scissors" && computerChoice === "paper")
-    ) {
-      this.resultText.text = "Dobrze!";
-      this.resultText.style.fill = "#4ade80"; // Green
-
-      // Player Attacks Boss
-      const playerStats = UsersCharacter.getData().stats;
-      const damage = CombatUtils.rollAttackDamage(
-        playerStats.attack.value,
-        GlobalConfig.SCALING_MULTIPLIER,
-      );
-
-      // Boss has no shield currently, just HP
-      const result = CombatUtils.applyDamage(
-        this.bossDisplay.hp,
-        this.bossDisplay.shield,
-        damage,
-      );
-      this.bossDisplay.updateHealth(result.hp);
-      this.bossDisplay.updateShield(result.shield);
-
-      // Slash Animation
-      SlashEffect.playOn(this.bossDisplay, slashTexture);
-      if (this.bossDisplay.hp <= 0) {
-        this.handleWin();
-        return;
-      }
-    } else {
-      this.resultText.text = "Kiepsko!";
-      this.resultText.style.fill = "#ef4444"; // Red
-
-      // Boss Attacks Player
-      const bossBaseDamage = 5;
-      const damage = CombatUtils.rollAttackDamage(
-        bossBaseDamage,
-        GlobalConfig.SCALING_MULTIPLIER,
-      );
-
-      const result = CombatUtils.applyDamage(
-        this.playerDisplay.hp,
-        this.playerDisplay.shield,
-        damage,
-      );
-
-      this.playerDisplay.updateHealth(result.hp);
-      this.playerDisplay.updateShield(result.shield);
-
-      if (this.playerDisplay.hp <= 0) {
-        this.handleLoss();
-        return;
-      }
-    }
-
-    // Clear result text and reset animation after delay
-    setTimeout(() => {
-      if (!this.destroyed) {
-        this.resultText.text = "";
-        this.bossIdleAnim.gotoAndPlay(0);
-        this.bossDisplay.setVisual(this.bossIdleAnim);
-      }
-    }, 1500);
   }
 
   private handleWin(): void {
