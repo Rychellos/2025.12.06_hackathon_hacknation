@@ -27,6 +27,7 @@ import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
 import UsersCharacter from "../data/UsersCharacter";
 import { SlashEffect } from "../components/SlashEffect";
+import { GameProgress } from "../data/GameProgress";
 
 export class NumberGuessBossScene extends Container {
   private app: Application;
@@ -319,6 +320,19 @@ export class NumberGuessBossScene extends Container {
 
         // Slash Animation
         SlashEffect.playOn(this.bossDisplay, slashTexture);
+
+        // Check for victory
+        if (this.bossDisplay.hp <= 0) {
+          this.resultText.text = "VICTORY!";
+          this.resultText.style.fill = "#ffd700";
+          GameProgress.markBossAsBeaten(3); // Mark Boss 3 as beaten
+
+          setTimeout(() => {
+            this.app.stage.removeChild(this);
+            this.destroy();
+            this.app.stage.addChild(new LevelSelectScene(this.app));
+          }, 2000);
+        }
       } else {
         this.resultText.text = "WRONG!";
         this.resultText.style.fill = "#ef4444"; // Red
@@ -337,6 +351,18 @@ export class NumberGuessBossScene extends Container {
         );
         this.playerDisplay.updateHealth(result.hp);
         this.playerDisplay.updateShield(result.shield);
+
+        // Check for defeat
+        if (this.playerDisplay.hp <= 0) {
+          this.resultText.text = "DEFEAT...";
+          this.resultText.style.fill = "#880000";
+
+          setTimeout(() => {
+            this.app.stage.removeChild(this);
+            this.destroy();
+            this.app.stage.addChild(new LevelSelectScene(this.app));
+          }, 2000);
+        }
       }
 
       // Clear result text after delay

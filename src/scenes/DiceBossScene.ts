@@ -25,6 +25,7 @@ import UsersCharacter from "../data/UsersCharacter";
 import { ImageButton } from "../components/ImageButton";
 import { SlashEffect } from "../components/SlashEffect";
 import { slashTexture } from "../AssetManager";
+import { GameProgress } from "../data/GameProgress";
 
 type DieValue = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -471,6 +472,13 @@ export class DiceBossScene extends Container {
 
       if (this.bossDisplay.hp <= 0) {
         this.showMessage("VICTORY!", "#ffd700");
+        GameProgress.markBossAsBeaten(2); // Mark Boss 2 as beaten
+
+        setTimeout(() => {
+          this.app.stage.removeChild(this);
+          this.destroy();
+          this.app.stage.addChild(new LevelSelectScene(this.app));
+        }, 2000);
         return;
       }
     }
@@ -509,6 +517,12 @@ export class DiceBossScene extends Container {
 
       if (this.playerDisplay.hp <= 0) {
         this.showMessage("DEFEAT...", "#880000");
+
+        setTimeout(() => {
+          this.app.stage.removeChild(this);
+          this.destroy();
+          this.app.stage.addChild(new LevelSelectScene(this.app));
+        }, 2000);
         return;
       }
     }
