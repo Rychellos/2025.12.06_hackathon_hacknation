@@ -21,6 +21,7 @@ export class UnitDisplay extends Container {
   private hpText: Text;
   private shieldText: Text;
   private showVisual: boolean;
+  private visualContainer?: Container;
 
   constructor(options: UnitDisplayOptions) {
     super();
@@ -31,7 +32,10 @@ export class UnitDisplay extends Container {
     this.showVisual = options.showVisual ?? true;
 
     if (this.showVisual) {
-      // Visual Placeholder
+      this.visualContainer = new Container();
+      this.addChild(this.visualContainer);
+
+      // Visual Placeholder (Default)
       const visual = new Graphics();
       visual.circle(0, 0, 60);
       visual.fill({ color: 0xff0000 });
@@ -41,7 +45,7 @@ export class UnitDisplay extends Container {
       visual.fill({ color: 0xffffff });
       visual.rect(-30, 20, 60, 10); // Mouth
       visual.fill({ color: 0x000000 });
-      this.addChild(visual);
+      this.visualContainer.addChild(visual);
     }
 
     // Name
@@ -167,5 +171,12 @@ export class UnitDisplay extends Container {
 
   public get shield(): number {
     return this.currentShield;
+  }
+
+  public setVisual(visual: Container): void {
+    if (this.visualContainer) {
+      this.visualContainer.removeChildren();
+      this.visualContainer.addChild(visual);
+    }
   }
 }

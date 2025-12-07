@@ -5,6 +5,9 @@ import {
   TextStyle,
   Graphics,
   Sprite,
+  AnimatedSprite,
+  Texture,
+  Rectangle,
 } from "pixi.js";
 
 import { UnitDisplay } from "../components/UnitDisplay";
@@ -16,6 +19,10 @@ import {
   paper,
   rock,
   scissors,
+  duckIdle,
+  duckRock,
+  duckPaper,
+  duckScissors,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -25,6 +32,7 @@ import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
 import { SlashEffect } from "../components/SlashEffect";
 import { slashTexture } from "../AssetManager";
+import { GameProgress } from "../data/GameProgress";
 
 type Choice = "rock" | "paper" | "scissors";
 
@@ -35,6 +43,11 @@ export class CombatScene extends Container {
   private resultText!: Text;
   private choiceText!: Text;
   private background!: Background;
+
+  private bossIdleAnim!: AnimatedSprite;
+  private bossRockAnim!: AnimatedSprite;
+  private bossPaperAnim!: AnimatedSprite;
+  private bossScissorsAnim!: AnimatedSprite;
 
   constructor(app: Application) {
     super();
@@ -85,15 +98,64 @@ export class CombatScene extends Container {
     this.addChild(floor);
   }
 
+  private createAnimatedSprite(
+    texture: Texture,
+    frameWidth: number,
+    frameHeight: number,
+    animationSpeed: number = 0.1,
+  ): AnimatedSprite {
+    const frames: Texture[] = [];
+    const cols = Math.floor(texture.width / frameWidth);
+    const rows = Math.floor(texture.height / frameHeight);
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const frame = new Texture({
+          source: texture.source,
+          frame: new Rectangle(
+            x * frameWidth,
+            y * frameHeight,
+            frameWidth,
+            frameHeight,
+          ),
+        });
+        frames.push(frame);
+      }
+    }
+
+    const anim = new AnimatedSprite(frames);
+    anim.animationSpeed = animationSpeed;
+    anim.play();
+    anim.anchor.set(0.5);
+    anim.scale.set(3); // Scale up pixel art
+    return anim;
+  }
+
   private createUI(): void {
+    // --- BOSS ANIMATIONS ---
+    // Duck sprites are 72x64px
+    this.bossIdleAnim = this.createAnimatedSprite(duckIdle, 72, 64, 0.1);
+    this.bossRockAnim = this.createAnimatedSprite(duckRock, 72, 64, 0.1);
+    this.bossPaperAnim = this.createAnimatedSprite(duckPaper, 72, 64, 0.1);
+    this.bossScissorsAnim = this.createAnimatedSprite(
+      duckScissors,
+      72,
+      64,
+      0.1,
+    );
+
     // --- BOSS AREA (Top Right) ---
     this.bossDisplay = new UnitDisplay({
-      name: "EVIL BOSS",
+      name: "MROCZNA KACZKA",
       maxHp: 100,
       currentHp: 100,
       maxShield: 50,
       currentShield: 50,
+      showVisual: true,
     });
+
+    // Set initial visual
+    this.bossDisplay.setVisual(this.bossIdleAnim);
 
     // Position top-right
     const bossX = this.app.screen.width * 0.75;
@@ -149,7 +211,7 @@ export class CombatScene extends Container {
     const rockBtn = new ImageButton({
       texture: rock,
       width: btnWidth,
-      height: 50,
+      height: 120,
       onClick: () => this.play("rock"),
     });
     rockBtn.position.set(-btnSpacing, 0);
@@ -157,7 +219,7 @@ export class CombatScene extends Container {
     const paperBtn = new ImageButton({
       texture: paper,
       width: btnWidth,
-      height: 50,
+      height: 120,
       onClick: () => this.play("paper"),
     });
     paperBtn.position.set(0, 0);
@@ -165,7 +227,7 @@ export class CombatScene extends Container {
     const scissorsBtn = new ImageButton({
       texture: scissors,
       width: btnWidth,
-      height: 50,
+      height: 120,
       onClick: () => this.play("scissors"),
     });
     scissorsBtn.position.set(btnSpacing, 0);
@@ -181,7 +243,7 @@ export class CombatScene extends Container {
       fontWeight: "bold",
       fill: "#8888aa",
     });
-    const title = new Text({ text: "BATTLE START", style: titleStyle });
+    const title = new Text({ text: "WALCZ", style: titleStyle });
     title.position.set(20, 80); // Below back button
     this.addChild(title);
 
@@ -228,7 +290,7 @@ export class CombatScene extends Container {
       style: choiceStyle,
     });
     this.choiceText.anchor.set(0.5, 1);
-    this.choiceText.position.set(actionPanelX, actionPanelY - 30);
+    this.choiceText.position.set(actionPanelX, actionPanelY - 80);
     this.addChild(this.choiceText);
 
     // Back Button
@@ -259,17 +321,30 @@ export class CombatScene extends Container {
     const choices: Choice[] = ["rock", "paper", "scissors"];
     const computerChoice = choices[Math.floor(Math.random() * choices.length)];
 
+    // Play Boss Animation
+    let anim: AnimatedSprite;
+    if (computerChoice === "rock") {
+      anim = this.bossRockAnim;
+    } else if (computerChoice === "paper") {
+      anim = this.bossPaperAnim;
+    } else {
+      anim = this.bossScissorsAnim;
+    }
+
+    anim.gotoAndPlay(0);
+    this.bossDisplay.setVisual(anim);
+
     this.choiceText.text = `Wybrałeś ${playerChoice.toUpperCase()}! Przeciwnik wybrał ${computerChoice.toUpperCase()}!`;
 
     if (playerChoice === computerChoice) {
-      this.resultText.text = "REMIS!";
+      this.resultText.text = "Remis!";
       this.resultText.style.fill = "#ffffff";
     } else if (
       (playerChoice === "rock" && computerChoice === "scissors") ||
       (playerChoice === "paper" && computerChoice === "rock") ||
       (playerChoice === "scissors" && computerChoice === "paper")
     ) {
-      this.resultText.text = "Wygrałeś!";
+      this.resultText.text = "Dobrze!";
       this.resultText.style.fill = "#4ade80"; // Green
 
       // Player Attacks Boss
@@ -289,10 +364,13 @@ export class CombatScene extends Container {
       this.bossDisplay.updateShield(result.shield);
 
       // Slash Animation
-      // Slash Animation
       SlashEffect.playOn(this.bossDisplay, slashTexture);
+      if (this.bossDisplay.hp <= 0) {
+        this.handleWin();
+        return;
+      }
     } else {
-      this.resultText.text = "Przegrałeś!";
+      this.resultText.text = "Kiepsko!";
       this.resultText.style.fill = "#ef4444"; // Red
 
       // Boss Attacks Player
@@ -310,14 +388,42 @@ export class CombatScene extends Container {
 
       this.playerDisplay.updateHealth(result.hp);
       this.playerDisplay.updateShield(result.shield);
+
+      if (this.playerDisplay.hp <= 0) {
+        this.handleLoss();
+        return;
+      }
     }
 
-    // Clear result text after delay
+    // Clear result text and reset animation after delay
     setTimeout(() => {
       if (!this.destroyed) {
         this.resultText.text = "";
+        this.bossIdleAnim.gotoAndPlay(0);
+        this.bossDisplay.setVisual(this.bossIdleAnim);
       }
     }, 1500);
+  }
+
+  private handleWin(): void {
+    this.resultText.text = "ZWYCIĘSTWO!";
+    this.resultText.style.fill = "#ffd700"; // Gold
+    GameProgress.markBossAsBeaten(1); // Mark Boss 1 as beaten
+
+    setTimeout(() => {
+      this.destroy();
+      this.app.stage.addChild(new LevelSelectScene(this.app));
+    }, 2000);
+  }
+
+  private handleLoss(): void {
+    this.resultText.text = "PORAŻKA...";
+    this.resultText.style.fill = "#880000"; // Dark Red
+
+    setTimeout(() => {
+      this.destroy();
+      this.app.stage.addChild(new LevelSelectScene(this.app));
+    }, 2000);
   }
 
   private showSlotMachine(): void {

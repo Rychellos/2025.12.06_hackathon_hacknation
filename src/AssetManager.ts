@@ -113,5 +113,20 @@ export const casino_table_panel: Texture = await Assets.load(
 );
 
 export const slashTexture: Texture = await Assets.load(
-  (await import("./assets/slash-sprite.png")).default,
+  (await import("./assets/slash-sprite.png")).default);
+// --- DUCK BOSS ASSETS ---
+export const duckIdle: Texture = await Assets.load(
+  (await import("./assets/sheets/duckiduckduck.png")).default,
+);
+
+export const duckRock: Texture = await Assets.load(
+  (await import("./assets/sheets/duck-rock.png")).default,
+);
+
+export const duckPaper: Texture = await Assets.load(
+  (await import("./assets/sheets/duck-paper.png")).default,
+);
+
+export const duckScissors: Texture = await Assets.load(
+  (await import("./assets/sheets/duck-scissors.png")).default,
 );
