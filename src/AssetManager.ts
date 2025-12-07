@@ -31,6 +31,14 @@ export const bossbackground: Texture = await Assets.load(
   (await import("./assets/casinoBG.png")).default,
 );
 
+export const bossIdleTexture: Texture = await Assets.load(
+  (await import("./assets/kostek-spoko.png")).default,
+);
+
+export const bossAttackTexture: Texture = await Assets.load(
+  (await import("./assets/sheets/kostek-atak.png")).default,
+);
+
 export const rock: Texture = await Assets.load(
   (await import("./assets/kamien.png")).default,
 );

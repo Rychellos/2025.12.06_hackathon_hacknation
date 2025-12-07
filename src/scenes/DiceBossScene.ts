@@ -13,6 +13,8 @@ import {
   bossBackground,
   casino_table_panel,
   fleeButton,
+  bossIdleTexture,
+  bossAttackTexture,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -117,6 +119,9 @@ export class DiceBossScene extends Container {
       currentHp: 300,
       maxShield: 0,
       currentShield: 0,
+      visualTexture: bossIdleTexture,
+      pixelated: true,
+      visualScaleX: -3, // Flip horizontally to face left
     });
     this.bossDisplay.position.set(w * 0.75, h * 0.3);
     this.addChild(this.bossDisplay);
@@ -440,6 +445,7 @@ export class DiceBossScene extends Container {
       this.bossDisplay.updateShield(result.shield);
 
       // Slash Animation
+      // Play slash animation
       SlashEffect.playOn(this.bossDisplay, slashTexture);
 
       if (this.bossDisplay.hp <= 0) {
@@ -468,6 +474,9 @@ export class DiceBossScene extends Container {
     } else {
       const damage = Math.ceil(score / 10);
       this.showMessage(`BOSS HITS! ${damage} DMG`, "#ef4444");
+
+      // Boss Attack Animation
+      this.bossDisplay.playAnimation(bossAttackTexture);
 
       const result = CombatUtils.applyDamage(
         this.playerDisplay.hp,

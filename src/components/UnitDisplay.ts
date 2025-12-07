@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, TextStyle } from "pixi.js";
+import { Container, Graphics, Text, TextStyle, Texture, Sprite, AnimatedSprite, Rectangle } from "pixi.js";
 
 export interface UnitDisplayOptions {
   name: string;
@@ -8,6 +8,10 @@ export interface UnitDisplayOptions {
   currentShield?: number;
   showVisual?: boolean; // Option to hide the face visual if needed
   nameColor?: string;
+  visualTexture?: Texture; // Optional texture to replace default face
+  visualScaleX?: number;
+  visualScaleY?: number;
+  pixelated?: boolean;
 }
 
 export class UnitDisplay extends Container {
@@ -21,7 +25,13 @@ export class UnitDisplay extends Container {
   private hpText: Text;
   private shieldText: Text;
   private showVisual: boolean;
-  private visualContainer?: Container;
+
+  private visualContainer: Container;
+  private visualSprite?: Sprite;
+
+  private scaleX: number;
+  private scaleY: number;
+  private pixelated: boolean;
 
   constructor(options: UnitDisplayOptions) {
     super();
@@ -30,22 +40,35 @@ export class UnitDisplay extends Container {
     this.maxShield = options.maxShield ?? 0;
     this.currentShield = options.currentShield ?? 0;
     this.showVisual = options.showVisual ?? true;
+    this.scaleX = options.visualScaleX ?? 3;
+    this.scaleY = options.visualScaleY ?? 3;
+    this.pixelated = options.pixelated ?? false;
+
+    this.visualContainer = new Container();
+    this.addChild(this.visualContainer);
 
     if (this.showVisual) {
-      this.visualContainer = new Container();
-      this.addChild(this.visualContainer);
-
-      // Visual Placeholder (Default)
-      const visual = new Graphics();
-      visual.circle(0, 0, 60);
-      visual.fill({ color: 0xff0000 });
-      // Add a simple "face" or mark
-      visual.circle(-20, -10, 10); // Left eye
-      visual.circle(20, -10, 10); // Right eye
-      visual.fill({ color: 0xffffff });
-      visual.rect(-30, 20, 60, 10); // Mouth
-      visual.fill({ color: 0x000000 });
-      this.visualContainer.addChild(visual);
+      if (options.visualTexture) {
+        // Texture Visual
+        if (this.pixelated) {
+          options.visualTexture.source.scaleMode = "nearest";
+        }
+        this.visualSprite = new Sprite(options.visualTexture);
+        this.visualSprite.anchor.set(0.5);
+        this.visualSprite.scale.set(this.scaleX, this.scaleY);
+        this.visualContainer.addChild(this.visualSprite);
+      } else {
+        // Default Visual Placeholder
+        const visual = new Graphics();
+        visual.circle(0, 0, 60);
+        visual.fill({ color: 0xff0000 });
+        visual.circle(-20, -10, 10);
+        visual.circle(20, -10, 10);
+        visual.fill({ color: 0xffffff });
+        visual.rect(-30, 20, 60, 10);
+        visual.fill({ color: 0x000000 });
+        this.visualContainer.addChild(visual);
+      }
     }
 
     // Name
@@ -61,7 +84,7 @@ export class UnitDisplay extends Container {
       style: nameStyle,
     });
     nameText.anchor.set(0.5, 1);
-    nameText.position.set(0, this.showVisual ? -70 : -30); // Adjust pos if visual is hidden
+    nameText.position.set(0, this.showVisual ? -70 : -30);
     this.addChild(nameText);
 
     // HP Bar Background
@@ -86,7 +109,7 @@ export class UnitDisplay extends Container {
     this.hpText.position.set(0, this.showVisual ? 90 : 20);
     this.addChild(this.hpText);
 
-    // Shield Bar (only if shield exists)
+    // Shield Bar
     this.shieldBar = new Graphics();
     this.shieldBar.position.set(-barWidth / 2, this.showVisual ? 110 : 40);
     this.addChild(this.shieldBar);
@@ -106,6 +129,44 @@ export class UnitDisplay extends Container {
     this.addChild(this.shieldText);
 
     this.updateVisuals();
+  }
+
+  public playAnimation(texture: Texture): void {
+    // Assume horizontal strip with square frames based on height
+    const frameHeight = texture.height;
+    const frameWidth = frameHeight;
+    const totalFrames = Math.floor(texture.width / frameWidth);
+
+    const frames: Texture[] = [];
+    if (this.pixelated) {
+      texture.source.scaleMode = "nearest";
+    }
+
+    for (let i = 0; i < totalFrames; i++) {
+      const rect = new Rectangle(i * frameWidth, 0, frameWidth, frameHeight);
+      const frameTex = new Texture({
+        source: texture.source,
+        frame: rect
+      });
+      frames.push(frameTex);
+    }
+
+    // Hide idle visual
+    this.visualContainer.visible = false;
+
+    const anim = new AnimatedSprite(frames);
+    anim.anchor.set(0.5);
+    anim.scale.set(this.scaleX, this.scaleY);
+    anim.animationSpeed = 0.15;
+    anim.loop = false;
+    anim.onComplete = () => {
+      anim.destroy();
+      this.visualContainer.visible = true; // Restore idle
+    };
+
+    // Add slightly above 0,0 typically, but here 0,0 is center
+    this.addChildAt(anim, this.getChildIndex(this.visualContainer) + 1);
+    anim.play();
   }
 
   private updateVisuals(): void {
