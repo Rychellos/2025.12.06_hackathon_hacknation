@@ -4,6 +4,7 @@ import { MenuButton } from "../components/MenuButton";
 import { AuthManager } from "../utils/AuthManager";
 import { MainMenuScene } from "./MainMenuScene";
 import { RegisterScene } from "./RegisterScene.ts";
+import UsersCharacter from "../data/UsersCharacter.ts";
 
 export class LoginScene extends Container {
     private app: Application;
@@ -174,6 +175,7 @@ export class LoginScene extends Container {
             setTimeout(() => {
                 this.app.stage.removeChild(this);
                 this.destroy();
+                UsersCharacter.getData().name = username;
                 this.app.stage.addChild(new MainMenuScene(this.app));
             }, 1000);
         }
