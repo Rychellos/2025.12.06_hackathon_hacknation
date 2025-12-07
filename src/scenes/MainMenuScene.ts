@@ -1,4 +1,11 @@
-import { Application, Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
+import {
+  Application,
+  Container,
+  Graphics,
+  Sprite,
+  Text,
+  TextStyle,
+} from "pixi.js";
 
 import { IntroScene } from "./IntroScene";
 import { LoginScene } from "./LoginScene";
@@ -28,6 +35,7 @@ export class MainMenuScene extends Container {
   private playButton!: ImageButton;
   private settingsButton!: ImageButton;
   private rankingButton!: ImageButton;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private titleAnimationFn?: (time: any) => void;
 
   constructor(app: Application, onPlayClick?: () => void) {
@@ -49,13 +57,14 @@ export class MainMenuScene extends Container {
     this.app.renderer.on("resize", this.onResize);
   }
 
-  public destroy(): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public destroy(options?: any): void {
     this.app.renderer.off("resize", this.onResize);
     this.app.ticker.remove(this.update);
     if (this.titleAnimationFn) {
       this.app.ticker.remove(this.titleAnimationFn);
     }
-    super.destroy({ children: true });
+    super.destroy(options);
   }
 
   // Login UI
@@ -223,7 +232,6 @@ export class MainMenuScene extends Container {
 
         UsersCharacter.getData().name = user.username;
 
-
         this.usernameText = new Text({
           text: `Witaj, ${user.username}!`,
           style,
@@ -288,7 +296,7 @@ export class MainMenuScene extends Container {
       if (particle.y < 0) particle.y = this.app.screen.height;
       if (particle.y > this.app.screen.height) particle.y = 0;
     });
-  }
+  };
 
   private onResize = (): void => {
     // Update background size
@@ -304,4 +312,3 @@ export class MainMenuScene extends Container {
     this.updateLoginUI();
   };
 }
-

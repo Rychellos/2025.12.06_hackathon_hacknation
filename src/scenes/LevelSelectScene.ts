@@ -1,5 +1,4 @@
 import { Application, Container, Text, TextStyle, Graphics } from "pixi.js";
-import { MenuButton } from "../components/MenuButton";
 import { MainMenuScene } from "./MainMenuScene";
 import { CharacterScreenScene } from "./CharacterScreenScene";
 import { CombatScene } from "./CombatScene";

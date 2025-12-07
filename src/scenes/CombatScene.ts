@@ -202,7 +202,7 @@ export class CombatScene extends Container {
     });
 
     // Position on the right side of the table
-    const playerX = this.app.screen.width * 0.20;
+    const playerX = this.app.screen.width * 0.2;
     const playerY = this.app.screen.height - 80;
     this.playerDisplay.position.set(playerX, playerY);
     this.addChild(this.playerDisplay);
@@ -244,7 +244,6 @@ export class CombatScene extends Container {
     scissorsBtn.position.set(btnSpacing, 0);
 
     actionContainer.addChild(rockBtn, paperBtn, scissorsBtn);
-
 
     // Result Text (Center Screen, large overlay effect)
     const resultStyle = new TextStyle({
@@ -463,9 +462,6 @@ export class CombatScene extends Container {
 
     this.addChild(slotMachineScene);
 
-    // Initial auto-roll
-    slotMachineScene.performInitialRoll();
-
     const userData = UsersCharacter.getData();
     this.playerDisplay.updateHealth(
       GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
@@ -478,16 +474,17 @@ export class CombatScene extends Container {
   }
 
   // --- UPDATE LOOP ---
-  private update(_ticker: any): void {
+  private update(): void {
     if (this.bossDisplay && this.bossDisplay.visualContainer) {
       const time = Date.now();
       // Breathing/Squash effect: Height changes by a few pixels
-      // Base scale is 1. We oscillate slightly. 
+      // Base scale is 1. We oscillate slightly.
       const scaleOffset = Math.sin(time * 0.003) * 0.05;
       this.bossDisplay.visualContainer.scale.y = 1 + scaleOffset;
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public override destroy(options?: any): void {
     this.app.ticker.remove(this.update, this);
     super.destroy(options);

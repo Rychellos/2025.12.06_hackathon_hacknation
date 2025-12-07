@@ -19,7 +19,7 @@ import {
   fleeButton,
   lotekBossTexture,
   lottoTexture,
-  slashTexture
+  slashTexture,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -136,7 +136,7 @@ export class NumberGuessBossScene extends Container {
     });
 
     // Position on the right side of the table
-    const playerX = this.app.screen.width * 0.20;
+    const playerX = this.app.screen.width * 0.2;
     const playerY = this.app.screen.height - 80;
     this.playerDisplay.position.set(playerX, playerY);
     this.addChild(this.playerDisplay);
@@ -223,7 +223,6 @@ export class NumberGuessBossScene extends Container {
       sphereContainer.position.set(x + 128, y + 40);
       actionContainer.addChild(sphereContainer);
     }
-
 
     // Result Text (Center Screen, large overlay effect)
     const resultStyle = new TextStyle({
@@ -402,9 +401,12 @@ export class NumberGuessBossScene extends Container {
       fontWeight: "bold",
       fill: "#ffffff",
       stroke: { color: "#000000", width: 4 },
-      align: "center"
+      align: "center",
     });
-    const numText = new Text({ text: resultNumber.toString(), style: numStyle });
+    const numText = new Text({
+      text: resultNumber.toString(),
+      style: numStyle,
+    });
     numText.anchor.set(0.5);
     numText.position.set(0, 80); // Bottom of sprite (64*4/2 = 128, so 80 is good)
     numText.visible = false;
@@ -456,9 +458,6 @@ export class NumberGuessBossScene extends Container {
 
     this.addChild(slotMachineScene);
 
-    // Initial auto-roll
-    slotMachineScene.performInitialRoll();
-
     const userData = UsersCharacter.getData();
     this.playerDisplay.updateHealth(
       GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
@@ -470,7 +469,7 @@ export class NumberGuessBossScene extends Container {
     );
   }
   // --- UPDATE LOOP ---
-  private update(_ticker: any): void {
+  private update(): void {
     if (this.bossDisplay && this.bossDisplay.visualContainer) {
       const time = Date.now();
       // Breathing/Squash effect
@@ -479,6 +478,7 @@ export class NumberGuessBossScene extends Container {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public override destroy(options?: any): void {
     this.app.ticker.remove(this.update, this);
     super.destroy(options);
