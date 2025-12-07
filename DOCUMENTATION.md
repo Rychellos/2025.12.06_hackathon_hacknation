@@ -68,3 +68,11 @@ Gra polega na zgadywaniu wylosowanej liczby (Lotto).
 3. **Rozstrzygnięcie**:
    - **Trafienie (Twoja liczba == Liczba Bossa)**: Wygrywasz! Zadajesz bossowi potężne obrażenia oparte na Twoim Ataku.
    - **Pudło (Inna liczba)**: Przegrywasz. Boss zadaje Ci 10 punktów obrażeń.
+
+## Role:
+1. **Sprites**: Bartosz Molski i Sergiusz Kutny
+2. **Music**: Dawid Wereszka
+3. **Sound effects**: Sergiusz Kutny i Dawid Wereszka
+4. **Coding**: Łukasz Ryszowski, Piotr de Biberstein Kazimirski i Sergiusz Kutny with the help of Antigravity
+5. **Backgrounds**: Nano Banana AI was used
+6. **Voiceover**: Eleven Labs AI was used
