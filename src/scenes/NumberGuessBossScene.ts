@@ -5,6 +5,9 @@ import {
   TextStyle,
   Graphics,
   Sprite,
+  AnimatedSprite,
+  Texture,
+  Rectangle,
 } from "pixi.js";
 import { ImageButton } from "../components/ImageButton";
 
@@ -15,6 +18,8 @@ import {
   casino_table_panel,
   fleeButton,
   lotekBossTexture,
+  lottoTexture,
+  slashTexture
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -22,7 +27,6 @@ import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
 import UsersCharacter from "../data/UsersCharacter";
 import { SlashEffect } from "../components/SlashEffect";
-import { slashTexture } from "../AssetManager";
 
 export class NumberGuessBossScene extends Container {
   private app: Application;
@@ -86,7 +90,7 @@ export class NumberGuessBossScene extends Container {
   private createUI(): void {
     // --- BOSS AREA (Top Right) ---
     this.bossDisplay = new UnitDisplay({
-      name: "NUMBER BOSS",
+      name: "KRÓL LOTEK",
       maxHp: 100,
       currentHp: 100,
       maxShield: 50,
@@ -211,18 +215,6 @@ export class NumberGuessBossScene extends Container {
       actionContainer.addChild(sphereContainer);
     }
 
-    // --- INFO TEXTS ---
-
-    // Title
-    const titleStyle = new TextStyle({
-      fontFamily: "Arial",
-      fontSize: 24,
-      fontWeight: "bold",
-      fill: "#8888aa",
-    });
-    const title = new Text({ text: "GUESS BOSS (1-10)", style: titleStyle });
-    title.position.set(20, 80); // Below back button
-    this.addChild(title);
 
     // Result Text (Center Screen, large overlay effect)
     const resultStyle = new TextStyle({
@@ -290,64 +282,135 @@ export class NumberGuessBossScene extends Container {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
-    // Re-enable input
-    setTimeout(() => {
-      this.isProcessing = false;
-    }, 1000);
-
+    // Choose boss number
     const bossChoice = Math.floor(Math.random() * 10) + 1; // 1-10
 
-    this.choiceText.text = `You picked ${playerChoice}. Boss picked ${bossChoice}.`;
+    this.playLottoDraw(bossChoice, () => {
+      this.isProcessing = false;
 
-    if (playerChoice === bossChoice) {
-      this.resultText.text = "CORRECT!";
-      this.resultText.style.fill = "#4ade80"; // Green
+      this.choiceText.text = `You picked ${playerChoice}. Boss picked ${bossChoice}.`;
 
-      // Deal damage to BOSS
-      // Use player stats for damage? Or fixed?
-      // Let's use stats for consistency with other scenes
-      const playerStats = UsersCharacter.getData().stats;
-      const damage = CombatUtils.rollAttackDamage(
-        playerStats.attack.value,
-        GlobalConfig.SCALING_MULTIPLIER,
-      );
+      if (playerChoice === bossChoice) {
+        this.resultText.text = "CORRECT!";
+        this.resultText.style.fill = "#4ade80"; // Green
 
-      const result = CombatUtils.applyDamage(
-        this.bossDisplay.hp,
-        this.bossDisplay.shield,
-        damage,
-      );
-      this.bossDisplay.updateHealth(result.hp);
-      this.bossDisplay.updateShield(result.shield);
+        // Deal damage to BOSS
+        const playerStats = UsersCharacter.getData().stats;
+        const damage = CombatUtils.rollAttackDamage(
+          playerStats.attack.value,
+          GlobalConfig.SCALING_MULTIPLIER,
+        );
 
-      // Slash Animation
-      SlashEffect.playOn(this.bossDisplay, slashTexture);
-    } else {
-      this.resultText.text = "WRONG!";
-      this.resultText.style.fill = "#ef4444"; // Red
+        const result = CombatUtils.applyDamage(
+          this.bossDisplay.hp,
+          this.bossDisplay.shield,
+          damage,
+        );
+        this.bossDisplay.updateHealth(result.hp);
+        this.bossDisplay.updateShield(result.shield);
 
-      // Deal damage to PLAYER
-      const bossBaseDamage = 10;
-      const damage = CombatUtils.rollAttackDamage(
-        bossBaseDamage,
-        GlobalConfig.SCALING_MULTIPLIER,
-      );
+        // Slash Animation
+        SlashEffect.playOn(this.bossDisplay, slashTexture);
+      } else {
+        this.resultText.text = "WRONG!";
+        this.resultText.style.fill = "#ef4444"; // Red
 
-      const result = CombatUtils.applyDamage(
-        this.playerDisplay.hp,
-        this.playerDisplay.shield,
-        damage,
-      );
-      this.playerDisplay.updateHealth(result.hp);
-      this.playerDisplay.updateShield(result.shield);
+        // Deal damage to PLAYER
+        const bossBaseDamage = 10;
+        const damage = CombatUtils.rollAttackDamage(
+          bossBaseDamage,
+          GlobalConfig.SCALING_MULTIPLIER,
+        );
+
+        const result = CombatUtils.applyDamage(
+          this.playerDisplay.hp,
+          this.playerDisplay.shield,
+          damage,
+        );
+        this.playerDisplay.updateHealth(result.hp);
+        this.playerDisplay.updateShield(result.shield);
+      }
+
+      // Clear result text after delay
+      setTimeout(() => {
+        if (!this.destroyed) {
+          this.resultText.text = "";
+        }
+      }, 1500);
+    });
+  }
+
+  private createAnimatedSprite(
+    texture: Texture,
+    frameWidth: number,
+    frameHeight: number,
+    animationSpeed: number = 0.1,
+  ): AnimatedSprite {
+    texture.source.scaleMode = "nearest";
+    const frames: Texture[] = [];
+    const cols = Math.floor(texture.width / frameWidth);
+    const rows = Math.floor(texture.height / frameHeight);
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const frame = new Texture({
+          source: texture.source,
+          frame: new Rectangle(
+            x * frameWidth,
+            y * frameHeight,
+            frameWidth,
+            frameHeight,
+          ),
+        });
+        frames.push(frame);
+      }
     }
 
-    // Clear result text after delay
-    setTimeout(() => {
-      if (!this.destroyed) {
-        this.resultText.text = "";
-      }
-    }, 1500);
+    const anim = new AnimatedSprite(frames);
+    anim.animationSpeed = animationSpeed;
+    anim.loop = false;
+    anim.anchor.set(0.5);
+    return anim;
+  }
+
+  private playLottoDraw(resultNumber: number, onComplete: () => void): void {
+    // Create overlay
+    const overlay = new Container();
+    overlay.position.set(this.app.screen.width / 2, this.app.screen.height / 2);
+    this.addChild(overlay);
+
+    // Create Animation
+    // Assuming 64x64 frames based on file size/usual assets
+    const anim = this.createAnimatedSprite(lottoTexture, 64, 64, 0.2);
+    anim.scale.set(4); // Make it big
+    anim.play();
+    overlay.addChild(anim);
+
+    // Number Text (Hidden initially)
+    const numStyle = new TextStyle({
+      fontFamily: "Arial",
+      fontSize: 48,
+      fontWeight: "bold",
+      fill: "#ffffff",
+      stroke: { color: "#000000", width: 4 },
+      align: "center"
+    });
+    const numText = new Text({ text: resultNumber.toString(), style: numStyle });
+    numText.anchor.set(0.5);
+    numText.position.set(0, 80); // Bottom of sprite (64*4/2 = 128, so 80 is good)
+    numText.visible = false;
+    overlay.addChild(numText);
+
+    anim.onComplete = () => {
+      // Show number
+      numText.visible = true;
+
+      // Wait a bit then finish
+      setTimeout(() => {
+        overlay.destroy();
+        onComplete();
+      }, 1500); // 1.5s to see the result
+    };
   }
 
   private showSlotMachine(): void {

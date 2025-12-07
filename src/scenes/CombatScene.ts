@@ -245,18 +245,6 @@ export class CombatScene extends Container {
 
     actionContainer.addChild(rockBtn, paperBtn, scissorsBtn);
 
-    // --- INFO TEXTS ---
-
-    // Title
-    const titleStyle = new TextStyle({
-      fontFamily: "Arial",
-      fontSize: 24,
-      fontWeight: "bold",
-      fill: "#8888aa",
-    });
-    const title = new Text({ text: "WALCZ", style: titleStyle });
-    title.position.set(20, 80); // Below back button
-    this.addChild(title);
 
     // Result Text (Center Screen, large overlay effect)
     const resultStyle = new TextStyle({

@@ -23,6 +23,10 @@ export const bossBackground: Texture = await Assets.load(
   (await import("./assets/casinoBG.png")).default,
 );
 
+export const lottoTexture: Texture = await Assets.load(
+  (await import("./assets/sheets/losowanie-kuli.png")).default,
+);
+
 export const logo: Texture = await Assets.load(
   (await import("./assets/logo.png")).default,
 );

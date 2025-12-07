@@ -116,7 +116,7 @@ export class DiceBossScene extends Container {
 
     // --- UNITS ---
     this.bossDisplay = new UnitDisplay({
-      name: "DICE MASTER",
+      name: "MISTRZ KOŚCI",
       maxHp: 300, // Higher HP for score based game
       currentHp: 300,
       maxShield: 0,
