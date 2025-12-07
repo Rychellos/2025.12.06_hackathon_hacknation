@@ -727,7 +727,7 @@ export class DiceBossScene extends Container {
     // Center the slot machine scene
     slotMachineScene.position.set(
       this.app.screen.width / 2,
-      this.app.screen.height / 2 - 100, // Slightly offset up
+      this.app.screen.height / 2, // Centered
     );
 
     this.addChild(slotMachineScene);

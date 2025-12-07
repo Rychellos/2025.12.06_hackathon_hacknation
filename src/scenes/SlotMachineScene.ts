@@ -1,7 +1,7 @@
 import { Application, Container, Text, TextStyle } from "pixi.js";
 import { SlotMachine } from "../components/SlotMachine";
 import { ImageButton } from "../components/ImageButton";
-import { reroll_button, reroll_button_hover } from "../AssetManager";
+import { reroll_button_off, reroll_button_on } from "../AssetManager";
 
 export interface SlotMachineSceneOptions {
   app: Application;
@@ -48,7 +48,11 @@ export class SlotMachineScene extends Container {
     this.position.set(this.app.screen.width / 2, -500);
 
     const slotMachineWidth = this.slotMachine.width;
-    this.slotMachine.position.set(-slotMachineWidth / 2, 0); // Position relative to container center
+    const slotMachineHeight = this.slotMachine.height;
+    this.slotMachine.position.set(
+      -slotMachineWidth / 2,
+      -slotMachineHeight / 2,
+    ); // Position relative to container center
     this.addChild(this.slotMachine);
 
     // Create rerolls remaining text
@@ -65,10 +69,8 @@ export class SlotMachineScene extends Container {
       style: rerollStyle,
     });
 
-    this.rerollText.anchor.set(0.5, 0); // Anchor at top center of text
-
-    // Position at top center of the slot machine
-    // this.rerollText.position.set(32, -10); // Centered, slightly above
+    this.rerollText.anchor.set(0.5, 1); // Anchor at bottom center of text
+    this.rerollText.position.set(0, -slotMachineHeight / 2 - 10); // Above the machine
     this.addChild(this.rerollText);
 
     this.createNextButton();
@@ -78,39 +80,25 @@ export class SlotMachineScene extends Container {
   }
 
   private createNextButton(): void {
-    const buttonY = 175;
+    const slotMachineHeight = this.slotMachine.height;
+    const buttonY = slotMachineHeight / 2; // Below the machine
 
     // Next Button - centered
     this.nextButton = new ImageButton({
-      texture: reroll_button,
-      hoverTexture: reroll_button_hover,
-      width: 200,
+      texture: reroll_button_off,
+      activeTexture: reroll_button_on,
+      width: 192,
       height: 60,
       onClick: () => {
         if (this.onNext) {
           this.onNext();
         }
       },
+      hoverScale: false,
     });
 
-    this.nextButton.position.set(-100, buttonY); // Centered
+    this.nextButton.position.set(0, buttonY - 30); // Centered horizontally
     this.addChild(this.nextButton);
-
-    // Add "NEXT" label
-    const nextLabel = new Text({
-      text: "NEXT →",
-      style: new TextStyle({
-        fontFamily: "Arial, sans-serif",
-        fontSize: 24,
-        fontWeight: "bold",
-        fill: 0xffffff,
-        stroke: { color: 0x000000, width: 2 },
-      }),
-    });
-
-    nextLabel.anchor.set(0.5);
-    nextLabel.position.set(0, buttonY + 30); // Centered
-    this.addChild(nextLabel);
   }
 
   /**
