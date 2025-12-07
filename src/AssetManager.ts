@@ -105,11 +105,8 @@ export const reroll_button_on: Texture = await Assets.load(
   (await import("./assets/button_on.png")).default,
 );
 
-export const reroll_button_hover: Texture = await Assets.load(
-  "/assets/reroll_button_hover.png",
-);
 export const casino_table_panel: Texture = await Assets.load(
-  "/assets/casino_table_panel.png",
+  (await import("./assets/table.png")).default,
 );
 
 export const slashTexture: Texture = await Assets.load(
