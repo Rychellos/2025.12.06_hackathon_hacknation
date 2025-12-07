@@ -66,7 +66,7 @@ export class SlotMachineScene extends Container {
     });
 
     this.rerollText = new Text({
-      text: `Przerzuty: ${this.rerollsRemaining}/${this.maxRerolls}`,
+      text: `Losowania: ${this.rerollsRemaining}/${this.maxRerolls}`,
       style: rerollStyle,
     });
 
@@ -136,7 +136,7 @@ export class SlotMachineScene extends Container {
     }
 
     this.rerollsRemaining--;
-    this.rerollText.text = `Przerzuty: ${this.rerollsRemaining}/${this.maxRerolls}`;
+    this.rerollText.text = `Losowania: ${this.rerollsRemaining}/${this.maxRerolls}`;
 
     // Hide instruction text on first roll
     if (this.instructionText.visible) {
