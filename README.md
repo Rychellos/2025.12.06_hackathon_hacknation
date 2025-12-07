@@ -4,4 +4,4 @@ Prototyp gry opierającej się na szczęściu gracza. Zdanie zlecone przez Total
 
 ---
 
-[Więcej informacji w dokumentacji]([https://duckduckgo.com](https://github.com/Rychellos/2025.12.06_hackathon_hacknation/blob/master/DOCUMENTATION.md))
+[Więcej informacji w dokumentacji](DOCUMENTATION.md)
