@@ -106,24 +106,33 @@ export class NumberGuessBossScene extends Container {
     // --- CASINO TABLE (Bottom) ---
     const table = new Sprite(casino_table_panel);
     table.anchor.set(0.5, 1); // Anchor bottom center
-    table.width = 1020;
-    table.height = 300; // Adjust height to fit controls
+    table.width = 256 * 8;
+    table.height = 64 * 8; // Adjust height to fit controls
+    table.texture.source.scaleMode = "nearest";
     table.position.set(this.app.screen.width / 2, this.app.screen.height);
     this.addChild(table);
 
     // --- PLAYER AREA (Bottom Right of Table) ---
     this.playerDisplay = new UnitDisplay({
-      name: "PLAYER",
-      maxHp: GlobalConfig.SCALING_MULTIPLIER * 10, // Assuming base 10 for NumberGuess
-      currentHp: GlobalConfig.SCALING_MULTIPLIER * 10,
-      maxShield: GlobalConfig.SCALING_MULTIPLIER * 2,
-      currentShield: GlobalConfig.SCALING_MULTIPLIER * 2,
+      name: UsersCharacter.getData().name || "Gracz",
+      maxHp:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.hitPoints.value,
+      currentHp:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.hitPoints.value,
+      maxShield:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.defense.value,
+      currentShield:
+        GlobalConfig.SCALING_MULTIPLIER *
+        UsersCharacter.getData().stats.defense.value,
       showVisual: false,
       nameColor: "#4ade80",
     });
 
     // Position on the right side of the table
-    const playerX = this.app.screen.width * 0.75;
+    const playerX = this.app.screen.width * 0.20;
     const playerY = this.app.screen.height - 80;
     this.playerDisplay.position.set(playerX, playerY);
     this.addChild(this.playerDisplay);
@@ -207,7 +216,7 @@ export class NumberGuessBossScene extends Container {
       // Adjust Y to center the group vertically in the available space
       const y = row * spacingY;
 
-      sphereContainer.position.set(x, y);
+      sphereContainer.position.set(x + 128, y + 40);
       actionContainer.addChild(sphereContainer);
     }
 
