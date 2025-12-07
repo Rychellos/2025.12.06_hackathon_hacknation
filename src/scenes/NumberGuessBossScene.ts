@@ -30,6 +30,7 @@ import { CombatUtils } from "../utils/CombatUtils";
 import UsersCharacter from "../data/UsersCharacter";
 import { SlashEffect } from "../components/SlashEffect";
 import { SoundManager } from "../utils/SoundManager";
+import { GameProgress } from "../data/GameProgress";
 
 export class NumberGuessBossScene extends Container {
   private app: Application;
@@ -269,7 +270,7 @@ export class NumberGuessBossScene extends Container {
     });
 
     this.choiceText = new Text({
-      text: "Pick a number between 1 and 10...",
+      text: "Wybierz liczbę pomiędzy 1 a 10...",
       style: choiceStyle,
     });
     this.choiceText.anchor.set(0.5, 1);
@@ -302,10 +303,10 @@ export class NumberGuessBossScene extends Container {
     this.playLottoDraw(bossChoice, () => {
       this.isProcessing = false;
 
-      this.choiceText.text = `You picked ${playerChoice}. Boss picked ${bossChoice}.`;
+      this.choiceText.text = `Wybrałeś ${playerChoice}. Król Lotek wybrał ${bossChoice}.`;
 
       if (playerChoice === bossChoice) {
-        this.resultText.text = "CORRECT!";
+        this.resultText.text = "Prawidłowo!";
         this.resultText.style.fill = "#4ade80"; // Green
 
         // Deal damage to BOSS
@@ -326,12 +327,17 @@ export class NumberGuessBossScene extends Container {
         // Slash Animation
         SlashEffect.playOn(this.bossDisplay, slashTexture);
         SoundManager.getInstance().playSfx(sfxSlash);
+
+        if (this.bossDisplay.hp <= 0) {
+          this.handleWin();
+          return;
+        }
       } else {
-        this.resultText.text = "WRONG!";
+        this.resultText.text = "Źle!";
         this.resultText.style.fill = "#ef4444"; // Red
 
         // Deal damage to PLAYER
-        const bossBaseDamage = 10;
+        const bossBaseDamage = 1;
         const damage = CombatUtils.rollAttackDamage(
           bossBaseDamage,
           GlobalConfig.SCALING_MULTIPLIER,
@@ -348,6 +354,11 @@ export class NumberGuessBossScene extends Container {
         // Slash Animation
         SlashEffect.playOn(this.playerDisplay, slashTexture);
         SoundManager.getInstance().playSfx(sfxSlash);
+
+        if (this.playerDisplay.hp <= 0) {
+          this.handleLoss();
+          return;
+        }
       }
 
       // Clear result text after delay
@@ -487,6 +498,29 @@ export class NumberGuessBossScene extends Container {
       const scaleOffset = Math.sin(time * 0.003) * 0.05;
       this.bossDisplay.visualContainer.scale.y = 1 + scaleOffset;
     }
+  }
+
+  private handleWin(): void {
+    this.resultText.text = "ZWYCIĘSTWO!";
+    this.resultText.style.fill = "#ffd700"; // Gold
+
+    // Mark Boss 3 as beaten
+    GameProgress.markBossAsBeaten(3);
+
+    setTimeout(() => {
+      this.destroy();
+      this.app.stage.addChild(new LevelSelectScene(this.app));
+    }, 2000);
+  }
+
+  private handleLoss(): void {
+    this.resultText.text = "PORAŻKA...";
+    this.resultText.style.fill = "#880000"; // Dark Red
+
+    setTimeout(() => {
+      this.destroy();
+      this.app.stage.addChild(new LevelSelectScene(this.app));
+    }, 2000);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

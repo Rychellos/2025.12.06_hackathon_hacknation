@@ -168,7 +168,7 @@ export class LevelSelectScene extends Container {
         } else if (id === 3) {
           this.app.stage.addChild(new NumberGuessBossScene(this.app));
         } else {
-          this.app.stage.addChild(new CharacterScreenScene(this.app));
+          this.app.stage.addChild(new LevelSelectScene(this.app));
         }
       }
     };
