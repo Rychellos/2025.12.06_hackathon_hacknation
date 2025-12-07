@@ -6,7 +6,8 @@ import { CombatScene } from "./CombatScene";
 import { NumberGuessBossScene } from "./NumberGuessBossScene";
 import { DiceBossScene } from "./DiceBossScene";
 import { Background } from "../components/Background";
-import { levelSelectBackground } from "../AssetManager";
+import { backButton, levelSelectBackground } from "../AssetManager";
+import { ImageButton } from "../components/ImageButton";
 
 export class LevelSelectScene extends Container {
   private app: Application;
@@ -174,16 +175,16 @@ export class LevelSelectScene extends Container {
 
   private createUI(): void {
     // Back Button
-    const backBtn = new MenuButton({
-      label: "COFNIJ",
-      width: 120,
-      height: 50,
+    const backBtn = new ImageButton({
+      texture: backButton,
+      width: 256,
+      height: 64,
       onClick: () => {
         this.destroy();
         this.app.stage.addChild(new MainMenuScene(this.app));
       },
     });
-    backBtn.position.set(20, 20);
+    backBtn.position.set(132, 40);
     this.addChild(backBtn);
   }
 }

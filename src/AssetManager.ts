@@ -64,6 +64,18 @@ export const fleeButton: Texture = await Assets.load(
   (await import("./assets/flee.png")).default,
 );
 
+export const backButton: Texture = await Assets.load(
+  (await import("./assets/back.png")).default,
+);
+
+export const rollMoreButton: Texture = await Assets.load(
+  (await import("./assets/roll_more.png")).default,
+);
+
+export const passButton: Texture = await Assets.load(
+  (await import("./assets/pass.png")).default,
+);
+
 // Create spritesheet with 64x64px frames
 const slotySheetData = {
   frames: {} as Record<
