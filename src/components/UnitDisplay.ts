@@ -84,7 +84,8 @@ export class UnitDisplay extends Container {
       style: nameStyle,
     });
     nameText.anchor.set(0.5, 1);
-    nameText.position.set(0, this.showVisual ? -70 : -30);
+    // Move name higher: -130 if visual, else -30
+    nameText.position.set(0, this.showVisual ? -130 : -30);
     this.addChild(nameText);
 
     // HP Bar Background
@@ -92,7 +93,8 @@ export class UnitDisplay extends Container {
 
     // HP Bar
     this.hpBar = new Graphics();
-    this.hpBar.position.set(-barWidth / 2, this.showVisual ? 80 : 10);
+    // Move HP bar lower: 160 if visual, else 10
+    this.hpBar.position.set(-barWidth / 2, this.showVisual ? 160 : 10);
     this.addChild(this.hpBar);
 
     this.hpText = new Text({
@@ -106,12 +108,14 @@ export class UnitDisplay extends Container {
       }),
     });
     this.hpText.anchor.set(0.5);
-    this.hpText.position.set(0, this.showVisual ? 90 : 20);
+    // Update text position relative to bar
+    this.hpText.position.set(0, this.showVisual ? 170 : 20);
     this.addChild(this.hpText);
 
     // Shield Bar
     this.shieldBar = new Graphics();
-    this.shieldBar.position.set(-barWidth / 2, this.showVisual ? 110 : 40);
+    // Shield relative to HP bar
+    this.shieldBar.position.set(-barWidth / 2, this.showVisual ? 190 : 45);
     this.addChild(this.shieldBar);
 
     this.shieldText = new Text({
@@ -125,7 +129,7 @@ export class UnitDisplay extends Container {
       }),
     });
     this.shieldText.anchor.set(0.5);
-    this.shieldText.position.set(0, this.showVisual ? 120 : 50);
+    this.shieldText.position.set(0, this.showVisual ? 200 : 55);
     this.addChild(this.shieldText);
 
     this.updateVisuals();

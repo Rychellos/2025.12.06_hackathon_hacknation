@@ -14,6 +14,7 @@ import {
   bossBackground,
   casino_table_panel,
   fleeButton,
+  lotekBossTexture,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -39,6 +40,9 @@ export class NumberGuessBossScene extends Container {
     this.createUI();
     this.showSlotMachine();
     this.showTransition();
+
+    // Start Update Loop
+    this.app.ticker.add(this.update, this);
   }
 
   private showTransition(): void {
@@ -87,6 +91,10 @@ export class NumberGuessBossScene extends Container {
       currentHp: 100,
       maxShield: 50,
       currentShield: 50,
+      visualTexture: lotekBossTexture,
+      pixelated: true,
+      visualScaleX: 3, // Assuming regular facing right for now, or check need for flip
+      visualScaleY: 3,
     });
 
     // Position top-right
@@ -388,5 +396,19 @@ export class NumberGuessBossScene extends Container {
       GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
       GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
     );
+  }
+  // --- UPDATE LOOP ---
+  private update(_ticker: any): void {
+    if (this.bossDisplay && this.bossDisplay.visualContainer) {
+      const time = Date.now();
+      // Breathing/Squash effect
+      const scaleOffset = Math.sin(time * 0.003) * 0.05;
+      this.bossDisplay.visualContainer.scale.y = 1 + scaleOffset;
+    }
+  }
+
+  public override destroy(options?: any): void {
+    this.app.ticker.remove(this.update, this);
+    super.destroy(options);
   }
 }

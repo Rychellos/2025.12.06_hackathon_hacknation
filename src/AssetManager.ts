@@ -133,6 +133,10 @@ export const duckPaper: Texture = await Assets.load(
   (await import("./assets/sheets/duck-paper.png")).default,
 );
 
+export const lotekBossTexture: Texture = await Assets.load(
+  (await import("./assets/sheets/lotek2.png")).default,
+);
+
 export const duckScissors: Texture = await Assets.load(
   (await import("./assets/sheets/duck-scissors.png")).default,
 );
