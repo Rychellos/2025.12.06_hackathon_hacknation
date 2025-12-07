@@ -175,7 +175,7 @@ export class LevelSelectScene extends Container {
   private createUI(): void {
     // Back Button
     const backBtn = new MenuButton({
-      label: "BACK",
+      label: "COFNIJ",
       width: 120,
       height: 50,
       onClick: () => {

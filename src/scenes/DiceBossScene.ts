@@ -9,13 +9,19 @@ import {
 import { MenuButton } from "../components/MenuButton";
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
-import { bossBackground, casino_table_panel, fleeButton } from "../AssetManager";
+import {
+  bossBackground,
+  casino_table_panel,
+  fleeButton,
+} from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
 import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
 import UsersCharacter from "../data/UsersCharacter";
 import { ImageButton } from "../components/ImageButton";
+import { SlashEffect } from "../components/SlashEffect";
+import { slashTexture } from "../AssetManager";
 
 type DieValue = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -432,6 +438,9 @@ export class DiceBossScene extends Container {
       );
       this.bossDisplay.updateHealth(result.hp);
       this.bossDisplay.updateShield(result.shield);
+
+      // Slash Animation
+      SlashEffect.playOn(this.bossDisplay, slashTexture);
 
       if (this.bossDisplay.hp <= 0) {
         this.showMessage("VICTORY!", "#ffd700");

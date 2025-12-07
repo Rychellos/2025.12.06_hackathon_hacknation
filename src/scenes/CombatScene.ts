@@ -6,7 +6,7 @@ import {
   Graphics,
   Sprite,
 } from "pixi.js";
-import { MenuButton } from "../components/MenuButton";
+
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
 import {
@@ -23,6 +23,8 @@ import { ImageButton } from "../components/ImageButton";
 import UsersCharacter from "../data/UsersCharacter";
 import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
+import { SlashEffect } from "../components/SlashEffect";
+import { slashTexture } from "../AssetManager";
 
 type Choice = "rock" | "paper" | "scissors";
 
@@ -243,7 +245,17 @@ export class CombatScene extends Container {
     this.addChild(backBtn);
   }
 
+  private isProcessing: boolean = false;
+
   private play(playerChoice: Choice): void {
+    if (this.isProcessing) return;
+    this.isProcessing = true;
+
+    // Re-enable input after a delay (e.g., 1 second)
+    setTimeout(() => {
+      this.isProcessing = false;
+    }, 1000);
+
     const choices: Choice[] = ["rock", "paper", "scissors"];
     const computerChoice = choices[Math.floor(Math.random() * choices.length)];
 
@@ -275,6 +287,10 @@ export class CombatScene extends Container {
       );
       this.bossDisplay.updateHealth(result.hp);
       this.bossDisplay.updateShield(result.shield);
+
+      // Slash Animation
+      // Slash Animation
+      SlashEffect.playOn(this.bossDisplay, slashTexture);
     } else {
       this.resultText.text = "Przegrałeś!";
       this.resultText.style.fill = "#ef4444"; // Red

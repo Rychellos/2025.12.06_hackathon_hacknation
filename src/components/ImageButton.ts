@@ -9,7 +9,7 @@ export interface ImageButtonOptions {
   hoverTexture?: Texture;
   activeTexture?: Texture;
   scale?: number;
-  hoverScale?: boolean
+  hoverScale?: boolean;
 }
 
 /**
@@ -30,7 +30,7 @@ export class ImageButton extends Container {
     this.options = {
       width: options.texture.width,
       height: options.texture.height,
-      onClick: () => { },
+      onClick: () => {},
       scale: 1,
       ...options,
       hoverScale: options.hoverScale !== undefined ? options.hoverScale : true,
