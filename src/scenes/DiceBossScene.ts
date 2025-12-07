@@ -15,6 +15,8 @@ import {
   fleeButton,
   bossIdleTexture,
   bossAttackTexture,
+  rollMoreButton,
+  passButton,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -175,21 +177,21 @@ export class DiceBossScene extends Container {
     this.addChild(this.actionContainer);
 
     // Buttons
-    const rollBtn = new MenuButton({
-      label: "ROLL MORE",
-      width: 120,
-      height: 50,
+    const rollBtn = new ImageButton({
+      texture: rollMoreButton,
+      width: 192,
+      height: 48,
       onClick: () => this.actionRoll(),
     });
-    rollBtn.position.set(-70, 0);
+    rollBtn.position.set(64, -16);
 
-    const passBtn = new MenuButton({
-      label: "PASS & SCORE",
-      width: 140,
-      height: 50,
+    const passBtn = new ImageButton({
+      texture: passButton,
+      width: 192,
+      height: 48,
       onClick: () => this.actionPass(),
     });
-    passBtn.position.set(80, 0);
+    passBtn.position.set(64, 48);
 
     this.actionContainer.addChild(rollBtn, passBtn);
 
