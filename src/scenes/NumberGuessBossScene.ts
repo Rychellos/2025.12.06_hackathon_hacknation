@@ -263,7 +263,7 @@ export class NumberGuessBossScene extends Container {
     });
 
     this.choiceText = new Text({
-      text: "Pick a number between 1 and 10...",
+      text: "Wybierz liczbe od 1 do 10...",
       style: choiceStyle,
     });
     this.choiceText.anchor.set(0.5, 1);
@@ -296,10 +296,8 @@ export class NumberGuessBossScene extends Container {
     this.playLottoDraw(bossChoice, () => {
       this.isProcessing = false;
 
-      this.choiceText.text = `You picked ${playerChoice}. Boss picked ${bossChoice}.`;
-
       if (playerChoice === bossChoice) {
-        this.resultText.text = "CORRECT!";
+        this.resultText.text = "DOBRZE!";
         this.resultText.style.fill = "#4ade80"; // Green
 
         // Deal damage to BOSS
@@ -320,7 +318,7 @@ export class NumberGuessBossScene extends Container {
         // Slash Animation
         SlashEffect.playOn(this.bossDisplay, slashTexture);
       } else {
-        this.resultText.text = "WRONG!";
+        this.resultText.text = "ŻLE!";
         this.resultText.style.fill = "#ef4444"; // Red
 
         // Deal damage to PLAYER
