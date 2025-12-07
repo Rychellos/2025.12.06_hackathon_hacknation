@@ -1,7 +1,8 @@
 import { Application, Container, Text, TextStyle } from "pixi.js";
 import { SlotMachine } from "../components/SlotMachine";
 import { ImageButton } from "../components/ImageButton";
-import { reroll_button_off, reroll_button_on } from "../AssetManager";
+import { reroll_button_off, reroll_button_on, sfxSlot } from "../AssetManager";
+import { SoundManager } from "../utils/SoundManager";
 
 export interface SlotMachineSceneOptions {
   app: Application;
@@ -146,6 +147,7 @@ export class SlotMachineScene extends Container {
     // Pass target frame: 4 (5th sprite) if no rerolls left, 0 otherwise
     const targetFrame = this.rerollsRemaining === 0 ? 4 : 0;
     this.slotMachine.roll(targetFrame);
+    SoundManager.getInstance().playSfx(sfxSlot);
   }
 
   /**

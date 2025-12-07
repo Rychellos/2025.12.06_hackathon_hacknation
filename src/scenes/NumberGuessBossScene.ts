@@ -19,7 +19,9 @@ import {
   fleeButton,
   lotekBossTexture,
   lottoTexture,
+  musicPoKrulefsku,
   slashTexture,
+  sfxSlash,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -27,6 +29,7 @@ import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
 import UsersCharacter from "../data/UsersCharacter";
 import { SlashEffect } from "../components/SlashEffect";
+import { SoundManager } from "../utils/SoundManager";
 
 export class NumberGuessBossScene extends Container {
   private app: Application;
@@ -47,6 +50,9 @@ export class NumberGuessBossScene extends Container {
 
     // Start Update Loop
     this.app.ticker.add(this.update, this);
+
+    // Play Music
+    SoundManager.getInstance().playMusic(musicPoKrulefsku);
   }
 
   private showTransition(): void {
@@ -317,6 +323,7 @@ export class NumberGuessBossScene extends Container {
 
         // Slash Animation
         SlashEffect.playOn(this.bossDisplay, slashTexture);
+        SoundManager.getInstance().playSfx(sfxSlash);
       } else {
         this.resultText.text = "ŻLE!";
         this.resultText.style.fill = "#ef4444"; // Red
@@ -335,6 +342,10 @@ export class NumberGuessBossScene extends Container {
         );
         this.playerDisplay.updateHealth(result.hp);
         this.playerDisplay.updateShield(result.shield);
+
+        // Slash Animation
+        SlashEffect.playOn(this.playerDisplay, slashTexture);
+        SoundManager.getInstance().playSfx(sfxSlash);
       }
 
       // Clear result text after delay

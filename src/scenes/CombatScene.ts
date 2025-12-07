@@ -23,6 +23,7 @@ import {
   duckRock,
   duckPaper,
   duckScissors,
+  musicQuackDuck,
 } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
@@ -31,7 +32,8 @@ import UsersCharacter from "../data/UsersCharacter";
 import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
 import { SlashEffect } from "../components/SlashEffect";
-import { slashTexture } from "../AssetManager";
+import { slashTexture, musicKaczka, sfxSlash } from "../AssetManager";
+import { SoundManager } from "../utils/SoundManager";
 import { GameProgress } from "../data/GameProgress";
 
 type Choice = "rock" | "paper" | "scissors";
@@ -66,6 +68,9 @@ export class CombatScene extends Container {
 
     // Start Update Loop
     this.app.ticker.add(this.update, this);
+
+    // Play Music
+    SoundManager.getInstance().playMusic(musicKaczka);
   }
 
   private showTransition(): void {
@@ -360,6 +365,7 @@ export class CombatScene extends Container {
 
         // Slash Animation
         SlashEffect.playOn(this.bossDisplay, slashTexture);
+        SoundManager.getInstance().playSfx(sfxSlash);
         if (this.bossDisplay.hp <= 0) {
           this.handleWin();
           return;
@@ -386,6 +392,7 @@ export class CombatScene extends Container {
 
         // Slash Animation
         SlashEffect.playOn(this.playerDisplay, slashTexture); // Assuming player also gets a slash effect when hit
+        SoundManager.getInstance().playSfx(sfxSlash);
         if (this.playerDisplay.hp <= 0) {
           this.handleLoss();
           return;
@@ -411,6 +418,7 @@ export class CombatScene extends Container {
     this.resultText.text = "ZWYCIĘSTWO!";
     this.resultText.style.fill = "#ffd700"; // Gold
     GameProgress.markBossAsBeaten(1); // Mark Boss 1 as beaten
+    SoundManager.getInstance().playSfx(musicQuackDuck);
 
     setTimeout(() => {
       this.destroy();
