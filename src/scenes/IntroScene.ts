@@ -118,6 +118,9 @@ export class IntroScene extends Container {
     // Remove listener
     window.removeEventListener("keydown", this.onKeyDown);
 
+    // Remove from stage before destroying
+    this.app.stage.removeChild(this);
+
     // Go to LevelSelect
     this.destroy({ children: true });
 
