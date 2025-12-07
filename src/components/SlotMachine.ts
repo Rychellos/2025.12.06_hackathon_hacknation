@@ -2,9 +2,10 @@ import { Container, Sprite, Texture } from "pixi.js";
 import { slotySheet } from "../AssetManager";
 import { BetterReel } from "./BetterReel";
 import UsersCharacter from "../data/UsersCharacter";
+import { generateRandomStats } from "../CharacterUtils";
 
 export interface SlotMachineOptions {
-  onRollComplete?: (value: number) => void;
+  onRollComplete?: (value: number[]) => void;
   onClick?: () => void;
 }
 
@@ -26,26 +27,15 @@ export class SlotMachine extends Container {
     super();
     this.options = options;
 
-    // Get all available frames from the spritesheet
     this.availableFrames = Object.values(slotySheet.textures);
 
-    // Use first frame from spritesheet as background
     this.background = new Sprite(this.availableFrames[0]);
 
-    // Disable smoothing for crisp pixel art
     this.background.texture.source.scaleMode = "nearest";
 
-    // Scale only the background by 3x
     this.background.scale.set(3);
 
     this.addChild(this.background);
-
-    // Create rolling number displays
-    // Position text over the 3 number slots in the spritesheet
-    // Based on previous code:
-    // yPos = this.background.height / 2 + 15;
-    // startX = this.background.width / 5 - 4;
-    // spacing = this.background.width / 5 - 2;
 
     const reelWidth = 40;
     const reelHeight = 40; // Visible area
@@ -60,6 +50,7 @@ export class SlotMachine extends Container {
         values: [1, 2, 3, 4, 5, 6],
         symbolHeight: 40, // Match visible height for single symbol view
       });
+
       reel.position.set(startX + spacing * i, yPos);
       this.addChild(reel);
       this.reels.push(reel);
@@ -68,6 +59,7 @@ export class SlotMachine extends Container {
     // Make clickable
     this.eventMode = "static";
     this.cursor = "pointer";
+
     this.on("pointerdown", () => {
       // Cooldown - only allow clicks when not rolling
       if (!this.isRolling && this.options.onClick) {
@@ -96,10 +88,7 @@ export class SlotMachine extends Container {
 
     // Start spinning all reels
     this.reels.forEach((reel, index) => {
-      const val = this.targetRolls[index];
-      const valIndex = val - 1;
-
-      reel.spin(valIndex);
+      reel.spin(this.targetRolls[index]);
     });
   }
 
@@ -107,17 +96,17 @@ export class SlotMachine extends Container {
    * Generate 3 random dice rolls
    */
   private generateRolls(): number[] {
-    const rolls = [
-      Math.floor(Math.random() * 6) + 1,
-      Math.floor(Math.random() * 6) + 1,
-      Math.floor(Math.random() * 6) + 1,
+    const rolls = generateRandomStats();
+
+    UsersCharacter.setAttack((rolls.attack.value % 6) + 1);
+    UsersCharacter.setHitPoints((rolls.hitPoints.value % 6) + 1);
+    UsersCharacter.setDefense((rolls.defense.value % 6) + 1);
+
+    return [
+      (rolls.attack.value % 6) + 1,
+      (rolls.hitPoints.value % 6) + 1,
+      (rolls.defense.value % 6) + 1,
     ];
-
-    UsersCharacter.setAttack(rolls[0]);
-    UsersCharacter.setHitPoints(rolls[1]);
-    UsersCharacter.setDefense(rolls[2]);
-
-    return rolls
   }
 
   /**
@@ -166,12 +155,9 @@ export class SlotMachine extends Container {
       // Re-enable cursor
       this.cursor = "pointer";
 
-      // Calculate final stat value
-      const finalValue = this.rolls.reduce((sum, roll) => sum + roll, 0);
-
       // Notify callback
       if (this.options.onRollComplete) {
-        this.options.onRollComplete(finalValue);
+        this.options.onRollComplete(this.rolls);
       }
     }
   }

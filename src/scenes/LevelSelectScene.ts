@@ -34,8 +34,6 @@ export class LevelSelectScene extends Container {
     this.addChild(this.background);
   }
 
-
-
   private createNodes(): void {
     this.nodesLayer = new Container();
     this.addChild(this.nodesLayer);
