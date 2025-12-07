@@ -164,4 +164,8 @@ export class UnitDisplay extends Container {
   public get hp(): number {
     return this.currentHp;
   }
+
+  public get shield(): number {
+    return this.currentShield;
+  }
 }

@@ -9,10 +9,12 @@ import {
 import { MenuButton } from "../components/MenuButton";
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
-import { bossbackground, casino_table_panel } from "../AssetManager";
+import { bossBackground, casino_table_panel } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
 import { GlobalConfig } from "../data/GlobalConfig";
+import { CombatUtils } from "../utils/CombatUtils";
+import UsersCharacter from "../data/UsersCharacter";
 
 type DieValue = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -61,7 +63,7 @@ export class DiceBossScene extends Container {
 
   private createBackground(): void {
     this.background = new Background({
-      texture: bossbackground,
+      texture: bossBackground,
       width: this.app.screen.width,
       height: this.app.screen.height,
     });
@@ -402,7 +404,14 @@ export class DiceBossScene extends Container {
     if (score > 0) {
       const damage = Math.ceil(score / 10);
       this.showMessage(`ATTACK! ${damage} DMG`, "#4ade80");
-      this.bossDisplay.updateHealth(Math.max(0, this.bossDisplay.hp - damage));
+
+      const result = CombatUtils.applyDamage(
+        this.bossDisplay.hp,
+        this.bossDisplay.shield,
+        damage,
+      );
+      this.bossDisplay.updateHealth(result.hp);
+      this.bossDisplay.updateShield(result.shield);
 
       if (this.bossDisplay.hp <= 0) {
         this.showMessage("VICTORY!", "#ffd700");
@@ -430,9 +439,14 @@ export class DiceBossScene extends Container {
     } else {
       const damage = Math.ceil(score / 10);
       this.showMessage(`BOSS HITS! ${damage} DMG`, "#ef4444");
-      this.playerDisplay.updateHealth(
-        Math.max(0, this.playerDisplay.hp - damage),
+
+      const result = CombatUtils.applyDamage(
+        this.playerDisplay.hp,
+        this.playerDisplay.shield,
+        damage,
       );
+      this.playerDisplay.updateHealth(result.hp);
+      this.playerDisplay.updateShield(result.shield);
 
       if (this.playerDisplay.hp <= 0) {
         this.showMessage("DEFEAT...", "#880000");
@@ -697,6 +711,17 @@ export class DiceBossScene extends Container {
         this.removeChild(overlay);
         this.removeChild(slotMachineScene);
       },
+      onRoll: () => {
+        const userData = UsersCharacter.getData();
+        this.playerDisplay.updateHealth(
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+        );
+        this.playerDisplay.updateShield(
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+        );
+      },
     });
 
     // Center the slot machine scene
@@ -709,6 +734,16 @@ export class DiceBossScene extends Container {
 
     // Initial auto-roll
     slotMachineScene.performInitialRoll();
+
+    const userData = UsersCharacter.getData();
+    this.playerDisplay.updateHealth(
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+    );
+    this.playerDisplay.updateShield(
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+    );
   }
 
   private delay(ms: number): Promise<void> {

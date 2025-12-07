@@ -10,10 +10,12 @@ import { MenuButton } from "../components/MenuButton";
 
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
-import { bossbackground, casino_table_panel } from "../AssetManager";
+import { bossBackground, casino_table_panel } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
 import { GlobalConfig } from "../data/GlobalConfig";
+import { CombatUtils } from "../utils/CombatUtils";
+import UsersCharacter from "../data/UsersCharacter";
 
 export class NumberGuessBossScene extends Container {
   private app: Application;
@@ -34,7 +36,7 @@ export class NumberGuessBossScene extends Container {
 
   private createBackground(): void {
     this.background = new Background({
-      texture: bossbackground,
+      texture: bossBackground,
       width: this.app.screen.width,
       height: this.app.screen.height,
     });
@@ -254,22 +256,44 @@ export class NumberGuessBossScene extends Container {
 
     this.choiceText.text = `You picked ${playerChoice}. Boss picked ${bossChoice}.`;
 
-    const dmg = 10;
-
     if (playerChoice === bossChoice) {
       this.resultText.text = "CORRECT!";
       this.resultText.style.fill = "#4ade80"; // Green
 
       // Deal damage to BOSS
-      const currentHp = this.bossDisplay.hp - dmg;
-      this.bossDisplay.updateHealth(Math.max(0, currentHp));
+      // Use player stats for damage? Or fixed?
+      // Let's use stats for consistency with other scenes
+      const playerStats = UsersCharacter.getData().stats;
+      const damage = CombatUtils.rollAttackDamage(
+        playerStats.attack.value,
+        GlobalConfig.SCALING_MULTIPLIER,
+      );
+
+      const result = CombatUtils.applyDamage(
+        this.bossDisplay.hp,
+        this.bossDisplay.shield,
+        damage,
+      );
+      this.bossDisplay.updateHealth(result.hp);
+      this.bossDisplay.updateShield(result.shield);
     } else {
       this.resultText.text = "WRONG!";
       this.resultText.style.fill = "#ef4444"; // Red
 
       // Deal damage to PLAYER
-      const currentHp = this.playerDisplay.hp - dmg;
-      this.playerDisplay.updateHealth(Math.max(0, currentHp));
+      const bossBaseDamage = 10;
+      const damage = CombatUtils.rollAttackDamage(
+        bossBaseDamage,
+        GlobalConfig.SCALING_MULTIPLIER,
+      );
+
+      const result = CombatUtils.applyDamage(
+        this.playerDisplay.hp,
+        this.playerDisplay.shield,
+        damage,
+      );
+      this.playerDisplay.updateHealth(result.hp);
+      this.playerDisplay.updateShield(result.shield);
     }
 
     // Clear result text after delay
@@ -293,6 +317,17 @@ export class NumberGuessBossScene extends Container {
         this.removeChild(overlay);
         this.removeChild(slotMachineScene);
       },
+      onRoll: () => {
+        const userData = UsersCharacter.getData();
+        this.playerDisplay.updateHealth(
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+        );
+        this.playerDisplay.updateShield(
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+          GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+        );
+      },
     });
 
     // Center the slot machine scene
@@ -305,5 +340,15 @@ export class NumberGuessBossScene extends Container {
 
     // Initial auto-roll
     slotMachineScene.performInitialRoll();
+
+    const userData = UsersCharacter.getData();
+    this.playerDisplay.updateHealth(
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.hitPoints.value,
+    );
+    this.playerDisplay.updateShield(
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+      GlobalConfig.SCALING_MULTIPLIER * userData.stats.defense.value,
+    );
   }
 }
