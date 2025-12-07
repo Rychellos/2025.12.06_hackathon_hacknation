@@ -30,7 +30,9 @@ export class IntroScene extends Container {
   private async initVideo(): Promise<void> {
     try {
       // Load the video texture
-      const texture = await Assets.load((await import("../assets/intro.mp4")).default);
+      const texture = await Assets.load(
+        (await import("../assets/intro.mp4")).default,
+      );
 
       if (this.isTransitioning) return;
 
