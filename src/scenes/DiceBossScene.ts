@@ -9,12 +9,13 @@ import {
 import { MenuButton } from "../components/MenuButton";
 import { UnitDisplay } from "../components/UnitDisplay";
 import { SlotMachineScene } from "./SlotMachineScene";
-import { bossBackground, casino_table_panel } from "../AssetManager";
+import { bossBackground, casino_table_panel, fleeButton } from "../AssetManager";
 import { LevelSelectScene } from "./LevelSelectScene";
 import { Background } from "../components/Background";
 import { GlobalConfig } from "../data/GlobalConfig";
 import { CombatUtils } from "../utils/CombatUtils";
 import UsersCharacter from "../data/UsersCharacter";
+import { ImageButton } from "../components/ImageButton";
 
 type DieValue = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -202,16 +203,16 @@ export class DiceBossScene extends Container {
     this.addChild(this.resultText);
 
     // Back Button
-    const backBtn = new MenuButton({
-      label: "← FLEE",
-      width: 100,
-      height: 40,
+    const backBtn = new ImageButton({
+      texture: fleeButton,
+      width: 256,
+      height: 64,
       onClick: () => {
         this.destroy();
         this.app.stage.addChild(new LevelSelectScene(this.app));
       },
     });
-    backBtn.position.set(20, 20);
+    backBtn.position.set(148, 48);
     this.addChild(backBtn);
   }
 

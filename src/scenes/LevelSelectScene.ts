@@ -62,20 +62,21 @@ export class LevelSelectScene extends Container {
     const node = new Container();
     node.position.set(x, y);
 
-    // Circle background
-    const circle = new Graphics();
-    const radius = 40;
+    // Button Body
+    const btn = new Graphics();
+    const radius = 40; // Define radius for shadow calculation
+    btn.circle(0, 0, radius);
+    btn.fill({ color: unlocked ? 0x22c55e : 0x555555 });
+    btn.stroke({ width: 4, color: 0xffffff });
 
-    circle.circle(0, 0, radius);
-    circle.fill({ color: unlocked ? 0xe67e22 : 0x95a5a6 }); // Orange if unlocked, Grey if locked
-    circle.stroke({ width: 4, color: 0xffffff });
+    // Set opacity to 50% (User requested 0.7, applied to bg only)
+    btn.alpha = 0.7;
 
-    // Shadow
     const shadow = new Graphics();
     shadow.ellipse(0, radius + 5, radius * 0.8, 10);
     shadow.fill({ color: 0x000000, alpha: 0.3 });
     node.addChild(shadow);
-    node.addChild(circle);
+    node.addChild(btn);
 
     // Number
     const textStyle = new TextStyle({
