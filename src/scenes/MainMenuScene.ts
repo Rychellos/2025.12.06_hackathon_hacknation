@@ -1,7 +1,10 @@
-import { Application, Container, Graphics, Sprite } from "pixi.js";
+import { Application, Container, Graphics, Sprite, Text, TextStyle } from "pixi.js";
 
 import { LevelSelectScene } from "./LevelSelectScene";
+import { LoginScene } from "./LoginScene";
 import { ImageButton } from "../components/ImageButton";
+import { MenuButton } from "../components/MenuButton"; // Use standard button for Login
+import { AuthManager } from "../utils/AuthManager";
 import {
   background,
   playButton,
@@ -24,6 +27,7 @@ export class MainMenuScene extends Container {
   private playButton!: ImageButton;
   private settingsButton!: ImageButton;
   private rankingButton!: ImageButton;
+  private titleAnimationFn?: (time: any) => void;
 
   constructor(app: Application, onPlayClick?: () => void) {
     super();
@@ -34,13 +38,28 @@ export class MainMenuScene extends Container {
     this.createParticles();
     this.createTitle();
     this.createButtons();
+    this.updateLoginUI();
 
     // Start animation loop
-    this.app.ticker.add(this.update.bind(this));
+    this.app.ticker.add(this.update);
 
     // Listen for resize events
-    window.addEventListener("resize", this.onResize);
+    // Listen for resize events via renderer to ensure screen props are updated
+    this.app.renderer.on("resize", this.onResize);
   }
+
+  public destroy(): void {
+    this.app.renderer.off("resize", this.onResize);
+    this.app.ticker.remove(this.update);
+    if (this.titleAnimationFn) {
+      this.app.ticker.remove(this.titleAnimationFn);
+    }
+    super.destroy({ children: true });
+  }
+
+  // Login UI
+  private loginButton?: MenuButton;
+  private usernameText?: Text;
 
   private createBackground(): void {
     this.background = new Graphics();
@@ -89,12 +108,13 @@ export class MainMenuScene extends Container {
     // Add pulse animation to title
     let elapsed = 0;
     const baseScale = 0.27;
-    this.app.ticker.add((time) => {
+    this.titleAnimationFn = (time) => {
       elapsed += time.deltaTime * 0.05;
       // Pulse scale relative to base scale
       const pulse = 1 + Math.sin(elapsed) * 0.05;
       this.title.scale.set(baseScale * pulse);
-    });
+    };
+    this.app.ticker.add(this.titleAnimationFn);
   }
 
   private positionTitle(): void {
@@ -111,6 +131,7 @@ export class MainMenuScene extends Container {
         if (this.onPlayClick) {
           this.onPlayClick();
         } else {
+          this.app.stage.removeChild(this);
           this.destroy();
           this.app.stage.addChild(new LevelSelectScene(this.app));
         }
@@ -136,7 +157,6 @@ export class MainMenuScene extends Container {
       label: "",
       onClick: () => {
         console.log("Ranking button clicked!");
-
         alert("View ranks!");
       },
       texture: rankingButton,
@@ -163,7 +183,93 @@ export class MainMenuScene extends Container {
     );
   }
 
-  private update(): void {
+  private updateLoginUI(): void {
+    const auth = AuthManager.getInstance();
+    const isLoggedIn = auth.isLoggedIn();
+    const user = auth.getCurrentUser();
+
+    // Remove existing elements if state changed or just to refresh
+    // For simplicity, we can check if we match the desired state
+    // Remove existing elements if state changed or just to refresh
+    // For simplicity, we can check if we match the desired state
+    // Remove existing elements if state changed or just to refresh
+    // For simplicity, we can check if we match the desired state
+    const needsRebuild =
+      (isLoggedIn && !this.usernameText) ||
+      (!isLoggedIn && (!this.loginButton || this.usernameText));
+
+    if (needsRebuild) {
+      if (this.loginButton) {
+        this.removeChild(this.loginButton);
+        this.loginButton.destroy();
+        this.loginButton = undefined;
+      }
+      if (this.usernameText) {
+        this.removeChild(this.usernameText);
+        this.usernameText.destroy();
+        this.usernameText = undefined;
+      }
+
+      if (isLoggedIn && user) {
+        // Logged In State
+        const style = new TextStyle({
+          fontFamily: "Arial",
+          fontSize: 20,
+          fill: "#ffffff",
+          align: "right",
+          fontWeight: "bold",
+        });
+        this.usernameText = new Text({
+          text: `Welcome, ${user.username}!`,
+          style,
+        });
+        this.usernameText.anchor.set(1, 0.5);
+        this.addChild(this.usernameText);
+
+        this.loginButton = new MenuButton({
+          label: "LOGOUT",
+          width: 120,
+          height: 40,
+          onClick: () => {
+            auth.logout();
+            this.updateLoginUI(); // Refresh UI
+          },
+        });
+        this.addChild(this.loginButton);
+      } else {
+        // Guest State
+        this.loginButton = new MenuButton({
+          label: "LOGIN",
+          width: 120,
+          height: 40,
+          onClick: () => {
+            this.app.stage.removeChild(this);
+            this.destroy();
+            this.app.stage.addChild(new LoginScene(this.app));
+          },
+        });
+        this.addChild(this.loginButton);
+      }
+    }
+
+    // Position elements
+    const padding = 20;
+    if (this.loginButton) {
+      this.loginButton.position.set(
+        this.app.screen.width - this.loginButton.width - padding,
+        padding + this.loginButton.height / 2,
+      );
+    }
+
+    if (this.usernameText && this.loginButton) {
+      this.usernameText.position.set(
+        this.app.screen.width - this.loginButton.width - padding * 2,
+        padding + this.loginButton.height / 2,
+      );
+    }
+  }
+
+  private update = (): void => {
     // Animate particles
     this.particles.forEach((particle) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -188,11 +294,9 @@ export class MainMenuScene extends Container {
 
     // Reposition buttons
     this.positionButtons();
-  };
 
-  destroy(): void {
-    this.app.ticker.remove(this.update.bind(this));
-    window.removeEventListener("resize", this.onResize);
-    super.destroy();
-  }
+    // Update login UI
+    this.updateLoginUI();
+  };
 }
+
