@@ -67,7 +67,7 @@ Gra polega na zgadywaniu wylosowanej liczby (Lotto).
 2. **Losowanie**: Boss losuje swoją liczbę (również 1-10).
 3. **Rozstrzygnięcie**:
    - **Trafienie (Twoja liczba == Liczba Bossa)**: Wygrywasz! Zadajesz bossowi potężne obrażenia oparte na Twoim Ataku.
-   - **Pudło (Inna liczba)**: Przegrywasz. Boss zadaje Ci 10 punktów obrażeń.
+   - **Pudło (Inna liczba)**: Przegrywasz. Boss zadaje Ci do 10 punktów obrażeń.
 
 ## Role:
 1. **Sprites**: Bartosz Molski i Sergiusz Kutny
