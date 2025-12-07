@@ -23,6 +23,8 @@ import {
 import { SoundManager } from "../utils/SoundManager";
 import UsersCharacter from "../data/UsersCharacter";
 
+let introPlayed = false;
+
 /**
  * Main menu scene for the game
  */
@@ -159,7 +161,11 @@ export class MainMenuScene extends Container {
         } else {
           this.app.stage.removeChild(this);
           this.destroy();
-          this.app.stage.addChild(new IntroScene(this.app));
+
+          if (!introPlayed) {
+            introPlayed = true;
+            this.app.stage.addChild(new IntroScene(this.app));
+          }
         }
       },
       texture: playButton,

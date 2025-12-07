@@ -214,7 +214,7 @@ export class DiceBossScene extends Container {
     });
     this.turnScoreText = new Text({ text: "Pot: 0", style: potStyle });
     this.turnScoreText.anchor.set(0.5);
-    this.turnScoreText.position.set(w * 0.6, h - 50);
+    this.turnScoreText.position.set(w * 0.61, h - 50);
     this.addChild(this.turnScoreText);
 
     // Selection Score (Current Selection)
@@ -299,7 +299,7 @@ export class DiceBossScene extends Container {
     this.updateUI();
     this.diceContainer.removeChildren(); // Hide dice
     this.actionContainer.visible = true;
-    this.showMessage("YOUR TURN");
+    this.showMessage("Twoja kolej");
 
 
     setTimeout(() => this.rollDice(), 1000);
@@ -352,7 +352,7 @@ export class DiceBossScene extends Container {
 
     if (maxScore === 0) {
       await this.delay(500);
-      this.showMessage("BUST!", "#ef4444");
+      this.showMessage("Przyłapany!", "#ef4444");
       // Lose Pot
       this.turnAccumulatedScore = 0;
       this.updateUI();
@@ -370,13 +370,13 @@ export class DiceBossScene extends Container {
     // 1. Validate Selection
     const selectedDice = this.dice.filter((d) => d.held);
     if (selectedDice.length === 0) {
-      this.showMessage("Select dice to score first!");
+      this.showMessage("Wybierz kości do spasowania!");
       return;
     }
 
     const score = this.calculateStrictScore(selectedDice.map((d) => d.value));
     if (score === 0) {
-      this.showMessage("Selection yields 0 points!");
+      this.showMessage("Wybór daje 0 punktów!");
       return;
     }
 
@@ -390,7 +390,7 @@ export class DiceBossScene extends Container {
     // 3. Check Hot Hand (If all dice are strictly banked)
     const allBanked = this.dice.every((d) => d.banked);
     if (allBanked) {
-      this.showMessage("HOT HAND!", "#ffd700");
+      this.showMessage("Gorąca dłoń!", "#ffd700");
       this.dice.forEach((d) => {
         d.banked = false;
         d.held = false;
@@ -417,7 +417,7 @@ export class DiceBossScene extends Container {
         selectedDice.map((d) => d.value),
       );
       if (finalAddScore === 0) {
-        this.showMessage("Invalid selection!");
+        this.showMessage("Nieprawidłowy dobór!");
         return;
       }
     } else {
@@ -427,7 +427,7 @@ export class DiceBossScene extends Container {
       // Check if there are "Active" dice (unbanked, unheld).
       const active = this.dice.filter((d) => !d.banked);
       if (active.length > 0) {
-        this.showMessage("Must select scoring dice!");
+        this.showMessage("Musisz wybrać kości punktujące!");
         return;
       }
     }
@@ -442,7 +442,7 @@ export class DiceBossScene extends Container {
 
     if (score > 0) {
       const damage = Math.ceil(score / 10);
-      this.showMessage(`ATTACK! ${damage} DMG`, "#4ade80");
+      this.showMessage(`Atakuje! ${damage} punktów obrażeń`, "#4ade80");
 
       const result = CombatUtils.applyDamage(
         this.bossDisplay.hp,
@@ -470,7 +470,7 @@ export class DiceBossScene extends Container {
 
   // --- BOSS AI --- (Simplified Logic)
   private async bossTurn(): Promise<void> {
-    this.showMessage("TURA BOSSA...");
+    this.showMessage("Tura przeciwnika...");
     await this.delay(1500);
 
     // Simplied AI: Weighted random damage
@@ -483,7 +483,7 @@ export class DiceBossScene extends Container {
     else if (rand < 0.95) damage = 35;
     else damage = 50;
 
-    this.showMessage(`BOSS ATAKUJE! ${damage} DMG`, "#ef4444");
+    this.showMessage(`Przeciwnik atakuje! ${damage} punktów obrażeń`, "#ef4444");
 
     // Boss Attack Animation
     this.bossDisplay.playAnimation(bossAttackTexture);
@@ -523,7 +523,7 @@ export class DiceBossScene extends Container {
   }
 
   private updateUI(): void {
-    this.turnScoreText.text = `Pot: ${this.turnAccumulatedScore}`;
+    this.turnScoreText.text = `Punkty: ${this.turnAccumulatedScore}`;
 
     // Calc current selection score
     const selected = this.dice.filter((d) => d.held);

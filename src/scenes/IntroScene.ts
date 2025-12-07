@@ -1,6 +1,8 @@
 import { Application, Container, Graphics, Sprite, Assets } from "pixi.js";
 import { LevelSelectScene } from "./LevelSelectScene";
 
+let introPlayed = false;
+
 export class IntroScene extends Container {
   private app: Application;
   private videoSprite!: Sprite;
@@ -58,7 +60,8 @@ export class IntroScene extends Container {
       this.addChild(this.videoSprite);
 
       // Play video
-      if (this.videoSource) {
+      if (this.videoSource && !introPlayed) {
+        introPlayed = true
         this.videoSource.currentTime = 0;
         this.videoSource.muted = false; // Enable sound
         this.videoSource.loop = false;
@@ -95,7 +98,8 @@ export class IntroScene extends Container {
       if (
         this.videoSource &&
         this.videoSource.paused &&
-        !this.videoSource.ended
+        !this.videoSource.ended &&
+        !introPlayed
       ) {
         // Try to play if paused (and not ended)
         this.videoSource.play().catch(() => this.transitionToNextScene());
