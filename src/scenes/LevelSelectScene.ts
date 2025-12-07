@@ -1,6 +1,5 @@
 import { Application, Container, Text, TextStyle, Graphics } from "pixi.js";
 import { MainMenuScene } from "./MainMenuScene";
-import { CharacterScreenScene } from "./CharacterScreenScene";
 import { CombatScene } from "./CombatScene";
 import { NumberGuessBossScene } from "./NumberGuessBossScene";
 import { DiceBossScene } from "./DiceBossScene";
