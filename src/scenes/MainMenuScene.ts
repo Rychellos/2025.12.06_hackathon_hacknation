@@ -12,6 +12,7 @@ import {
   settingsButton,
   logo,
 } from "../AssetManager";
+import UsersCharacter from "../data/UsersCharacter";
 
 /**
  * Main menu scene for the game
@@ -219,8 +220,12 @@ export class MainMenuScene extends Container {
           align: "right",
           fontWeight: "bold",
         });
+
+        UsersCharacter.getData().name = user.username;
+
+
         this.usernameText = new Text({
-          text: `Welcome, ${user.username}!`,
+          text: `Witaj, ${user.username}!`,
           style,
         });
         this.usernameText.anchor.set(1, 0.5);
